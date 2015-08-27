@@ -1,0 +1,122 @@
+package matchthree.screen;
+
+import flambe.Component;
+import flambe.display.Font;
+import flambe.display.ImageSprite;
+import flambe.display.Sprite;
+import flambe.display.TextSprite;
+import flambe.display.Texture;
+import flambe.Disposer;
+import flambe.Entity;
+import flambe.input.PointerEvent;
+import flambe.scene.Scene;
+import matchthree.main.element.GameElement;
+import matchthree.pxlSq.Utils;
+
+/**
+ * ...
+ * @author Anthony Ganzon
+ */
+class GameButton extends GameElement
+{
+	private var buttonNormalTexture: Texture;
+	private var buttonHoverTexture: Texture;
+	private var buttonDownTexture: Texture;
+	
+	private var buttonImage: ImageSprite;
+	
+	private var buttonTextFont: Font;
+	private var buttonTextSprite: TextSprite;
+	private var buttonText: String;
+	
+	private var buttonSprite: Sprite;
+	
+	private var buttonFunc: Void->Void;
+	
+	public function new(buttonFont: Font, buttonText: String, textures: Array<Dynamic>, ?fn:Void->Void) {
+		super();
+		
+		this.buttonTextFont = buttonFont;
+		this.buttonText = buttonText;
+		this.buttonNormalTexture = textures[0];
+		this.buttonHoverTexture = textures[1];
+		this.buttonDownTexture = textures[2];
+		this.buttonFunc = fn;
+	}
+	
+	override public function Init(): Void {
+		elementEntity.add(buttonSprite = new Sprite());
+			
+		buttonImage = new ImageSprite(buttonNormalTexture);
+		buttonImage.centerAnchor();
+		
+		if(buttonTextFont != null && buttonText != "") {
+			buttonTextSprite = new TextSprite(buttonTextFont, buttonText);
+			buttonTextSprite.centerAnchor();
+		}		
+	}
+	
+	override public function Draw(): Void {
+		AddToEntity(buttonImage);
+		AddToEntity(buttonTextSprite);	
+	}
+	
+	public function ButtonInteractive(): Void {
+		elementDisposer.add(
+			buttonSprite.pointerIn.connect(function(event: PointerEvent) {
+				if(buttonHoverTexture != null) {
+					buttonImage.texture = buttonHoverTexture;
+				}
+			})
+		);
+		
+		elementDisposer.add(
+			buttonSprite.pointerOut.connect(function(event: PointerEvent) {
+				if(buttonNormalTexture != null) {	
+					buttonImage.texture = buttonNormalTexture;
+				}
+			})
+		);
+		
+		elementDisposer.add(
+			buttonSprite.pointerDown.connect(function(event: PointerEvent) {
+				if(buttonDownTexture != null) {	
+					buttonImage.texture = buttonDownTexture;
+				}
+			})
+		);
+		
+		elementDisposer.add(
+			buttonSprite.pointerUp.connect(function(event: PointerEvent) {
+				buttonImage.texture = (buttonHoverTexture != null) ? buttonHoverTexture : buttonNormalTexture;
+				
+				if (buttonFunc != null) {
+					buttonFunc();
+				}
+			})
+		);
+	}
+	
+	override public function GetNaturalWidth():Float {
+		return buttonImage.getNaturalWidth();
+	}
+	
+	override public function GetNaturalHeight():Float {
+		return buttonImage.getNaturalHeight();
+	}
+	
+	override public function onStart() {
+		super.onStart();
+		
+		ButtonInteractive();
+	}
+	
+	override public function onUpdate(dt:Float) {
+		super.onUpdate(dt);
+		if (buttonSprite != null) {
+			buttonSprite.setAlpha(this.alpha._);
+			buttonSprite.setXY(this.x._, this.y._);
+			buttonSprite.setScaleXY(this.scaleX._, this.scaleY._);
+		}
+	}
+}
