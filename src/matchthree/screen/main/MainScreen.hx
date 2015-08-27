@@ -92,6 +92,7 @@ class MainScreen extends GameScreen
 				Utils.ConsoleLog("PAUSED!");
 			}
 		);
+		
 		gamePauseBtn.SetXY(
 			boardImage.x._ + (boardImage.getNaturalWidth() / 2) - (gamePauseBtn.GetNaturalWidth() / 2), 
 			boardImage.y._ - (boardImage.getNaturalHeight() / 2) - (gamePauseBtn.GetNaturalHeight() * 0.75)
@@ -100,7 +101,8 @@ class MainScreen extends GameScreen
 		screenEntity.addChild(new Entity().add(gamePauseBtn));
 		
 		matchThreeMain = new MThreeMain(this);
-		matchThreeMain.SetXY(boardImage.x._ * 1.08, boardImage.y._ * 1.08);
+		//matchThreeMain.SetXY(boardImage.x._ * 1.08, boardImage.y._ * 1.08);
+		matchThreeMain.SetXY(boardImage.x._, boardImage.y._);	
 		matchThreeMain.SetParent(screenEntity);
 		screenEntity.addChild(new Entity().add(matchThreeMain));
 		

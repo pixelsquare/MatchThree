@@ -33,15 +33,15 @@ class GameButton extends GameElement
 	
 	private var buttonFunc: Void->Void;
 	
-	public function new(buttonFont: Font, buttonText: String, textures: Array<Dynamic>, ?fn:Void->Void) {
-		super();
-		
+	public function new(buttonFont: Font, buttonText: String, textures: Array<Dynamic>, ?fn:Void->Void) {		
 		this.buttonTextFont = buttonFont;
 		this.buttonText = buttonText;
 		this.buttonNormalTexture = textures[0];
 		this.buttonHoverTexture = textures[1];
 		this.buttonDownTexture = textures[2];
 		this.buttonFunc = fn;
+		
+		super();
 	}
 	
 	override public function Init(): Void {

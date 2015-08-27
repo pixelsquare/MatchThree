@@ -3,6 +3,8 @@ import flambe.asset.AssetPack;
 import flambe.display.Texture;
 import matchthree.main.element.tile.TileDataType;
 import matchthree.name.AssetName;
+import matchthree.main.element.block.MThreeBlock;
+import matchthree.main.element.tile.MThreeTile;
 
 /**
  * ...
@@ -31,5 +33,13 @@ class MThreeUtils
 		}
 		
 		return null;
+	}
+	
+	public static function SetTilesFillCount(tiles: Array<MThreeTile>, value: Int): Void {
+		for (tile in tiles) {
+			if (tile != null) {
+				tile.SetFillCount(value);
+			}
+		}
 	}
 }

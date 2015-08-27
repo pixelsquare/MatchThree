@@ -3,6 +3,7 @@ package matchthree.main.element.block;
 import matchthree.main.element.GameElement;
 import matchthree.main.element.grid.MThreeGrid;
 import matchthree.main.element.tile.MThreeTile;
+import matchthree.pxlSq.Utils;
 
 /**
  * ...
@@ -23,6 +24,10 @@ class MThreeBlock
 	
 	public function SetBlocked(): Void {
 		isBlocked = true;
+		
+		if (tile != null) {
+			tile.dispose();
+		}
 	}
 	
 	public function UnBlock(): Void {
@@ -42,5 +47,12 @@ class MThreeBlock
 			return false;
 			
 		return tile == null;
+	}
+	
+	public function DestroyTile(): Void {
+		if (tile == null)
+			return;
+		
+		tile.dispose();
 	}
 }
