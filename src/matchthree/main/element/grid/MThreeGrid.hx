@@ -1,6 +1,7 @@
 package matchthree.main.element.grid;
 
 import flambe.display.ImageSprite;
+import flambe.display.Texture;
 import matchthree.main.element.GameElement;
 import matchthree.pxlSq.Utils;
 import matchthree.name.AssetName;
@@ -14,10 +15,17 @@ class MThreeGrid extends GameElement implements IGrid
 	public var idx(default, null): Int;
 	public var idy(default, null): Int;
 	
+	private var backgroundTex: Texture;
 	private var background: ImageSprite;
 	
-	public function new() {
+	public function new(bgTex: Texture) {
+		this.backgroundTex = bgTex;
 		super();
+	}
+	
+	override public function Init():Void {
+		background = new ImageSprite(backgroundTex);
+		background.centerAnchor();
 	}
 	
 	override public function Draw(): Void {
@@ -44,13 +52,6 @@ class MThreeGrid extends GameElement implements IGrid
 	
 	override public function GetNaturalHeight():Float {
 		return background.getNaturalHeight();
-	}
-	
-	override public function onAdded() {
-		super.onAdded();
-		
-		background = new ImageSprite(parent.get(MThreeMain).dataManager.gameAsset.getTexture(AssetName.ASSET_CUBE));
-		background.centerAnchor();
 	}
 	
 	override public function onUpdate(dt:Float) {

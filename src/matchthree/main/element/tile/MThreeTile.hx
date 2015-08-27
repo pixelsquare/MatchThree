@@ -22,7 +22,8 @@ class MThreeTile extends GameElement implements IGrid
 	private var tileImage: ImageSprite;
 	private var tileDataType: TileDataType;
 	
-	public function new() {
+	public function new(tileData: MThreeTileData) {
+		this.tileData = tileData;
 		super();
 	}
 	
@@ -53,14 +54,6 @@ class MThreeTile extends GameElement implements IGrid
 	
 	override public function Draw(): Void {
 		AddToEntity(tileImage);
-	}
-	
-	override public function onAdded() {
-		super.onAdded();
-		//Utils.ConsoleLog((parent.get(MThreeMain) == null) + " " + (owner.get(MThreeMain) == null));
-		//Utils.ConsoleLog(parent.toString());
-	
-		Init();
 	}
 	
 	override public function onUpdate(dt:Float) {
