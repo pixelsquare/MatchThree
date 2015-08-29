@@ -86,6 +86,10 @@ class GameOverScreen extends GameScreen
 		);
 		menuEntity.addChild(new Entity().add(scoreText));
 		
+		SceneManager.instance.gameMainScreen.matchThreeMain.gameScore.watch(function(newScore:Float, oldScore:Float) {
+			scoreText.text = Std.int(newScore) + "";
+		});
+		
 		var restartBtn: GameButton = new GameButton(
 			new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32),
 			"Restart",

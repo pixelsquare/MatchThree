@@ -31,7 +31,7 @@ import matchthree.name.FontName;
  */
 class MainScreen extends GameScreen
 {
-	private var matchThreeMain: MThreeMain;
+	public var matchThreeMain(default, null): MThreeMain;
 	private var gamePauseBtn: GameButton;
 	
 	public function new(assetPack: AssetPack, storage: StorageSystem) {		

@@ -146,72 +146,46 @@ class MThreeUtils
 	
 	public static function GetTilesOfType(type: TileDataType): Array<MThreeTileCube> {
 		var tiles: Array<MThreeTileCube> = new Array<MThreeTileCube>();
-		for (tile in mThreeMain.tileCubeList) {
-			if (tile.GetTileDataType() != type)
+		for (tile in mThreeMain.tileList) {
+			if (cast(tile, MThreeTileCube).GetTileDataType() != type)
 				continue;
 				
-			tiles.push(tile);
+			tiles.push(cast(tile, MThreeTileCube));
 		}
 		
 		return tiles;
 	}
-
-	public static function GetShortCrossedTiles(tile: MThreeTileCube): Array<MThreeTileCube> {
-		var result: Array<MThreeTileCube> = new Array<MThreeTileCube>();
-		
-		var idx: Int = tile.idx;
-		var idy: Int = tile.idy;
-		
-		//Utils.ConsoleLog(((idx + 1) < GameConstants.GRID_ROWS) + " Right");
-		if ((idx + 1) < GameConstants.GRID_ROWS) {
-			result.push(cast(mThreeMain.gridBlocks[idx + 1][idy].tile, MThreeTileCube));
-		}
-		
-		//Utils.ConsoleLog(((idx - 1) >= 0) + " Left");
-		if ((idx - 1) >= 0) {
-			result.push(cast(mThreeMain.gridBlocks[idx - 1][idy].tile, MThreeTileCube));
-		}
-		
-		//Utils.ConsoleLog(((idy + 1) < GameConstants.GRID_COLS) + " Bottom");
-		if ((idy + 1) < GameConstants.GRID_COLS) {
-			result.push(cast(mThreeMain.gridBlocks[idx][idy + 1].tile, MThreeTileCube));
-		}
-		
-		//Utils.ConsoleLog(((idy - 1) >= 0) + " Up");
-		if ((idy - 1) >= 0) {
-			result.push(cast(mThreeMain.gridBlocks[idx][idy - 1].tile, MThreeTileCube));
-		}
-		
-		return result;
-	}
 	
-	public static function GetLongCrossedTiles(tile: MThreeTileCube): Array<MThreeTileCube> {
+	public static function GetCrossedTiles(tile: MThreeTileCube, length: Int): Array<MThreeTileCube> {
 		var result: Array<MThreeTileCube> = new Array<MThreeTileCube>();
 		
 		var idx: Int = tile.idx;
 		var idy: Int = tile.idy;
 		
-		//Utils.ConsoleLog(((idx + 1) < GameConstants.GRID_ROWS) + " Right");
-		if ((idx + 2) < GameConstants.GRID_ROWS) {
-			result.push(cast(mThreeMain.gridBlocks[idx + 2][idy].tile, MThreeTileCube));
+		for (i in 1...(length + 1)) {
+			//Utils.ConsoleLog(((idx + 1) < GameConstants.GRID_ROWS) + " Right");
+			if ((idx + i) < GameConstants.GRID_ROWS) {
+				result.push(cast(mThreeMain.gridBlocks[idx + i][idy].tile, MThreeTileCube));
+			}
+			
+			//Utils.ConsoleLog(((idx - 1) >= 0) + " Left");
+			if ((idx - i) >= 0) {
+				result.push(cast(mThreeMain.gridBlocks[idx - i][idy].tile, MThreeTileCube));
+			}
+			
+			//Utils.ConsoleLog(((idy + 1) < GameConstants.GRID_COLS) + " Bottom");
+			if ((idy + i) < GameConstants.GRID_COLS) {
+				result.push(cast(mThreeMain.gridBlocks[idx][idy + i].tile, MThreeTileCube));
+			}
+			
+			//Utils.ConsoleLog(((idy - 1) >= 0) + " Up");
+			if ((idy - i) >= 0) {
+				result.push(cast(mThreeMain.gridBlocks[idx][idy - i].tile, MThreeTileCube));
+			}
 		}
+
 		
-		//Utils.ConsoleLog(((idx - 1) >= 0) + " Left");
-		if ((idx - 2) >= 0) {
-			result.push(cast(mThreeMain.gridBlocks[idx - 2][idy].tile, MThreeTileCube));
-		}
-		
-		//Utils.ConsoleLog(((idy + 1) < GameConstants.GRID_COLS) + " Bottom");
-		if ((idy + 2) < GameConstants.GRID_COLS) {
-			result.push(cast(mThreeMain.gridBlocks[idx][idy + 2].tile, MThreeTileCube));
-		}
-		
-		//Utils.ConsoleLog(((idy - 1) >= 0) + " Up");
-		if ((idy - 2) >= 0) {
-			result.push(cast(mThreeMain.gridBlocks[idx][idy - 2].tile, MThreeTileCube));
-		}
-		
-		return result;
+		return result;		
 	}
 	
 	public static function GetHorizontal(tile: MThreeTileCube): Array<MThreeTileCube> {
@@ -350,14 +324,14 @@ class MThreeUtils
 		return result;
 	}
 	
-	public static function CheckPossibleMoves(): Bool {
+	public static function HasPossibleMoves(): Bool {
 		
 		for (dataType in Type.allEnums(TileDataType)) {
 			var tiles: Array<MThreeTileCube> = GetTilesOfType(dataType);
 			
 			for (tile in tiles) {
-				var crossedTiles: Array<MThreeTileCube> = GetShortCrossedTiles(tile);
-				crossedTiles = crossedTiles.concat(GetLongCrossedTiles(tile));
+				var crossedTiles: Array<MThreeTileCube> = GetCrossedTiles(tile, 2);
+				//crossedTiles = crossedTiles.concat(GetLongCrossedTiles(tile));
 				var typeCount: Map<TileDataType, Int> = new Map<TileDataType, Int>();
 				
 				//Utils.ConsoleLog(tile.GridIDToString());
@@ -392,5 +366,21 @@ class MThreeUtils
 		}
 		
 		return count > 0;
+	}
+	
+	public static function GetScore(tiles: Array<MThreeTileCube>): Float {
+		var score: Float = 0.0;
+		
+		if (tiles.length < 4) {
+			score = tiles.length * GameConstants.TILE_SCORE;
+		}
+		else if (tiles.length > 4) {
+			score = tiles.length * GameConstants.TILE_SCORE * 3;
+		}
+		else {
+			score = tiles.length * GameConstants.TILE_SCORE * 2;
+		}
+		
+		return score;
 	}
 }

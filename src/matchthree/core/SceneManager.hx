@@ -92,13 +92,11 @@ class SceneManager
 		Utils.ConsoleLog("SHOWING [" + instance.gamePauseScreen.GetScreenName() + "]");
 		UnwindToCurScene();
 		instance.gameDirector.pushScene(instance.gamePauseScreen.CreateScreen());
-		//gameDirector.unwindToScene(gamePauseScreen.CreateScreen());
 	}
 	
 	public static function ShowGameOverScreen(willANimate: Bool = false) : Void {
 		Utils.ConsoleLog("SHOWING [" + instance.gameOverScreen.GetScreenName() + "]");
 		UnwindToCurScene();
 		instance.gameDirector.pushScene(instance.gameOverScreen.CreateScreen());
-		//gameDirector.unwindToScene(gameOverScreen.CreateScreen());
 	}
 }

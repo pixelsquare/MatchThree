@@ -38,9 +38,7 @@ class MThreeMain extends GameElement
 	public var gridBoard(default, null): Array<Array<MThreeGrid>>;
 	public var gridBlocks(default, null): Array<Array<MThreeBlock>>;
 	public var gridSpawners(default, null): Array<Array<MThreeSpawner>>;
-	
 	public var tileList(default, null): Array<MThreeTile>;
-	public var tileCubeList(default, null): Array<MThreeTileCube>;
 	
 	public var gameScore(default, null): AnimatedFloat;
 	public var gameTime(default, null): AnimatedFloat;
@@ -102,7 +100,6 @@ class MThreeMain extends GameElement
 	
 	public function CreateTiles(): Void {
 		tileList = new Array<MThreeTile>();
-		tileCubeList = new Array<MThreeTileCube>();
 		
 		for (ii in 0...gridBoard.length) {
 			for (grid in gridBoard[ii]) {
@@ -135,18 +132,6 @@ class MThreeMain extends GameElement
 		}
 	}
 	
-	public function CreateRandomTileCube(grid: IGrid, updatePos: Bool = true): MThreeTileCube {
-		if (tileDataTypes == null) {
-			var dataType: MThreeTileData = new MThreeTileData(MThreeUtils.GetTileTexture(TileDataType.TILE_TRIANGLE, dataManager.gameAsset), TileDataType.TILE_TRIANGLE);
-			return CreateTileCube(dataType, grid);
-		}
-		
-		var rand: Int = Math.round(Math.random() * Type.allEnums(TileDataType).length);
-		var randIndx: Int = rand % (Type.allEnums(TileDataType).length);	
-		
-		return CreateTileCube(tileDataTypes[randIndx], grid, updatePos);
-	}
-	
 	public function CreateTileCube(tileData: MThreeTileData, grid: IGrid, updatePos: Bool = true): MThreeTileCube {
 		var tile: MThreeTileCube = new MThreeTileCube(tileData);
 		tile.SetParent(owner);
@@ -160,15 +145,19 @@ class MThreeMain extends GameElement
 			tileList.push(tile);
 		}
 		
-		tileCubeList.push(tile);
 		return tile;
 	}
 	
-	public function RemoveTileCube(idx: Int, idy: Int): Void {
-		var block: MThreeBlock = gridBlocks[idx][idy];
-		if (block != null) {
-			block.DestroyTile();
+	public function CreateRandomTileCube(grid: IGrid, updatePos: Bool = true): MThreeTileCube {
+		if (tileDataTypes == null) {
+			var dataType: MThreeTileData = new MThreeTileData(MThreeUtils.GetTileTexture(TileDataType.TILE_TRIANGLE, dataManager.gameAsset), TileDataType.TILE_TRIANGLE);
+			return CreateTileCube(dataType, grid);
 		}
+		
+		var rand: Int = Math.round(Math.random() * Type.allEnums(TileDataType).length);
+		var randIndx: Int = rand % (Type.allEnums(TileDataType).length);	
+		
+		return CreateTileCube(tileDataTypes[randIndx], grid, updatePos);
 	}
 	
 	public function GameControls(): Void {
@@ -271,102 +260,57 @@ class MThreeMain extends GameElement
 		hasStarted = true;
 	}
 	
-	public function DEBUG_FUNCTION(): Void {
-		gridBlocks[3][3].SetBlocked();
-				
-		var pointerDown: Bool = false;
-		var curTile: MThreeTile = null;
-		var tileOut: MThreeTile = null;
-		
-		onTilePointerIn.connect(function(tile: MThreeTile) {
-			curTile = tile;
-		});	
-		
-		
-		System.pointer.down.connect(function(event: PointerEvent) {
-			//Utils.ConsoleLog(curTile.GridIDToString() + "");
-			if (curTile.isAnimating)
-				return;
-			
-			MThreeUtils.SwapTile(MThreeSwapDirection.SWAP_RIGHT, curTile, function() {
-				MThreeUtils.SwapTile(MThreeSwapDirection.SWAP_LEFT, curTile);
-			});
-		});
-		
-		//onTilePointerIn.connect(function(tile: MThreeTile) {
-			////Utils.ConsoleLog((tile == null) + "");
-			//
-			//curTile = tile;
-			//if (curTile != null) {
-				//tileOut = null;
-			//}
-		//});	
-		//
-		//onTilePointerOut.connect(function(tile: MThreeTile) {
-			////Utils.ConsoleLog((tile == null) + "");
-			//tileOut = tile;
-		//});
-		//
-		//System.pointer.down.connect(function(event: PointerEvent) {
-			////Utils.ConsoleLog((curTile == null) + " " + (tileOut == null));
-			//if (curTile == null || curTile == tileOut)
-				//return;
-			//
-			//RemoveTileCube(curTile.idx, curTile.idy);
-			//pointerDown = true;
-			////MThreeUtils.SetTilesKinematic(tileList, true);
-			////curTile.dispose();
-		//});
-		//
-		//System.pointer.up.connect(function(event: PointerEvent) {
-			//curTile = null;
-			//pointerDown = false;
-			////for (tile in tileList) {
-				////Utils.ConsoleLog(tile.fillCount + "");
-			////}
-		//});
-
-		//Utils.ConsoleLog("QWE");
-		//gridBlocks[1][7].DestroyTile();
-		//gridBlocks[1][7].tile.dispose();
-		//tileList[50].dispose();
-	
-		//for (ii in 0...gridBlocks.length) {
-			//for (block in gridBlocks[ii]) {				
-				//if (block.IsBlockEmpty()) {
-					//Utils.ConsoleLog(block.grid.GridIDToString());
-				//}
-			//}
-		//}
-		
-		//Utils.ConsoleLog(parent.toString());
-		//Utils.ConsoleLog((owner.get(MThreeMain) == null) + "");
-	}
-	
 	public function SetBoardDirty(): Void {		
+		if (!MThreeUtils.HasPossibleMoves()) {
+			BoardReset();
+		}
+
 		var matches: Array<Array<MThreeTileCube>> = MThreeUtils.GetAllMatches();
 		if (matches.length <= 0)
 			return;
 		
-		//Utils.ConsoleLog("Clearing Board!");
 		for (tiles in matches) {
-			Utils.ConsoleLog(tiles.length + "");
-			if (tiles.length < 4) {
-				gameScore._ += tiles.length * GameConstants.TILE_SCORE;
-			}
-			else if (tiles.length > 4) {
-				gameScore._ += tiles.length * GameConstants.TILE_SCORE * 3;
-			}
-			else {
-				gameScore._ += tiles.length * GameConstants.TILE_SCORE * 2;
-			}
-			
+			gameScore._ += MThreeUtils.GetScore(tiles);
 			
 			for (tile in tiles) {
 				tile.dispose();
 			}
 		}
 		
+		RepeatCleaning();
+	}
+		
+	public function InitBoard(): Void {
+		var matches: Array<Array<MThreeTileCube>> = MThreeUtils.GetAllMatches();
+		if (matches.length <= 0) 
+			return;
+
+		for (match in matches) {
+			for(tile in match) {
+				var rand: Int = Math.round(Math.random() * Type.allEnums(TileDataType).length);
+				var randIndx: Int = rand % (Type.allEnums(TileDataType).length);
+				
+				tile.tileData = tileDataTypes[randIndx];
+			}
+		}
+		
+		// Repeat the process
+		InitBoard();
+	}
+	
+	public function BoardReset(): Void {
+		for (i in 0...gridBlocks.length) {
+			for (block in gridBlocks[i]) {
+				if (block != null && block.tile != null) {
+					block.DestroyTile();
+				}
+			}
+		}
+
+		RepeatCleaning();
+	}
+	
+	public function RepeatCleaning(): Void {
 		var stageClear: Script = new Script();
 		stageClear.run(new Repeat(new Sequence([
 			new Delay(0.5),
@@ -382,20 +326,23 @@ class MThreeMain extends GameElement
 	
 	override public function onStart() {
 		super.onStart();
-
+		
 		PopulateTileData();
 		CreateGrid();
 		CreateBlocks();
 		CreateTiles();
 		CreateSpawners();
 		GameControls();
-		//DEBUG_FUNCTION();
-
-		SetBoardDirty();
-	}
-	
-	override public function onAdded() {
-		super.onAdded();
+		
+		// Making sure that when we initialize the board
+		// it doesn't contain any matches
+		InitBoard();
+		
+		System.keyboard.down.connect(function(event: KeyboardEvent) {
+			if (event.key == Key.Space) {
+				BoardReset();
+			}
+		});
 	}
 	
 	override public function onUpdate(dt:Float) {

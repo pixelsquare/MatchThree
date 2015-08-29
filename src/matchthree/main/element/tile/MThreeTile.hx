@@ -112,7 +112,7 @@ class MThreeTile extends GameElement implements IGrid
 		if (rightBlock == null || bottomBlock == null)
 			return;
 			
-		if (rightBlock.isBlocked || bottomBlock.IsBlockEmpty()) {
+		if (rightBlock.isBlocked && bottomBlock.IsBlockEmpty()) {
 			var bottomRight: MThreeBlock = mThreeMain.gridBlocks[idx + 1][idy + 1];
 			if (bottomRight == null)
 				return;
@@ -157,7 +157,7 @@ class MThreeTile extends GameElement implements IGrid
 		if (leftBlock == null || bottomBlock == null)
 			return;
 			
-		if (leftBlock.isBlocked || bottomBlock.IsBlockEmpty()) {
+		if (leftBlock.isBlocked && bottomBlock.IsBlockEmpty()) {
 			var bottomLeft: MThreeBlock = mThreeMain.gridBlocks[idx - 1][idy + 1];
 			if (bottomLeft == null)
 				return;
@@ -200,7 +200,6 @@ class MThreeTile extends GameElement implements IGrid
 	
 	override public function dispose() {
 		super.dispose();
-		//Utils.ConsoleLog("Disposing " + GridIDToString());
 		
 		var mThreeMain: MThreeMain = parent.get(MThreeMain);
 		if (mThreeMain != null) {

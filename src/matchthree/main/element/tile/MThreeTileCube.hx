@@ -28,18 +28,14 @@ class MThreeTileCube extends MThreeTileTouch
 	function set_tileData(newData: MThreeTileData): MThreeTileData {
 		tileTexture = newData.tileTexture;
 		tileDataType = newData.tileDataType;
+		
+		if (tileImage != null &&  tileData != null) {
+			tileImage.texture = tileTexture;
+		}
 		return tileData = newData;
 	}
 	
 	public function GetTileDataType(): TileDataType {
 		return tileDataType;
-	}
-	
-	override public function dispose() {
-		super.dispose();
-		var mThreeMain: MThreeMain = parent.get(MThreeMain);
-		if (mThreeMain != null) {
-			mThreeMain.tileCubeList.remove(this);
-		}
 	}
 }
