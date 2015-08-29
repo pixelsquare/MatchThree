@@ -1,6 +1,6 @@
 package matchthree.main.element.tile;
 import flambe.input.PointerEvent;
-import matchthree.main.element.MThreeMain;
+import matchthree.main.MThreeMain;
 
 /**
  * ...
@@ -21,9 +21,9 @@ class MThreeTileTouch extends MThreeTile
 			mThreeMain.onTilePointerIn.emit(this);
 		});
 		
-		//tileImage.pointerOut.connect(function(event: PointerEvent) {
-			//mThreeMain.onTilePointerIn.emit(null);
-		//});
+		tileImage.pointerOut.connect(function(event: PointerEvent) {
+			mThreeMain.onTilePointerOut.emit(this);
+		});
 	}
 	
 }

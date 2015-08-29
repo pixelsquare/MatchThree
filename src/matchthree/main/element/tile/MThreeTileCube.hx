@@ -1,6 +1,7 @@
 package matchthree.main.element.tile;
 
 import flambe.display.ImageSprite;
+import matchthree.main.MThreeMain;
 
 /**
  * ...
@@ -32,5 +33,13 @@ class MThreeTileCube extends MThreeTileTouch
 	
 	public function GetTileDataType(): TileDataType {
 		return tileDataType;
+	}
+	
+	override public function dispose() {
+		super.dispose();
+		var mThreeMain: MThreeMain = parent.get(MThreeMain);
+		if (mThreeMain != null) {
+			mThreeMain.tileCubeList.remove(this);
+		}
 	}
 }

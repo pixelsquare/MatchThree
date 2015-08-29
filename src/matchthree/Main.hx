@@ -38,8 +38,8 @@ class Main
 				sceneManager.InitScreens(mainPack, System.storage);
 				
 				#if flash				
-					//SceneManager.ShowTitleScreen(true);
-					SceneManager.ShowMainScreen(true);
+					SceneManager.ShowTitleScreen(true);
+					//SceneManager.ShowMainScreen(true);
 				#else
 					SceneManager.ShowScreen(new SplashScreen(preloadPack, 2), true);
 				#end

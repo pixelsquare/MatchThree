@@ -59,6 +59,10 @@ class SceneManager
 		gameScreenList.push(screen);
 	}
 	
+	public static function UnwindToCurScene(): Void {
+		instance.gameDirector.unwindToScene(curSceneEntity);
+	}
+	
 	public static function UnwindToScene(scene: Entity): Void {
 		instance.gameDirector.unwindToScene(scene);
 	}
@@ -86,12 +90,14 @@ class SceneManager
 	
 	public static function ShowPauseScreen(willAnimate: Bool = false): Void {	
 		Utils.ConsoleLog("SHOWING [" + instance.gamePauseScreen.GetScreenName() + "]");
+		UnwindToCurScene();
 		instance.gameDirector.pushScene(instance.gamePauseScreen.CreateScreen());
 		//gameDirector.unwindToScene(gamePauseScreen.CreateScreen());
 	}
 	
 	public static function ShowGameOverScreen(willANimate: Bool = false) : Void {
 		Utils.ConsoleLog("SHOWING [" + instance.gameOverScreen.GetScreenName() + "]");
+		UnwindToCurScene();
 		instance.gameDirector.pushScene(instance.gameOverScreen.CreateScreen());
 		//gameDirector.unwindToScene(gameOverScreen.CreateScreen());
 	}

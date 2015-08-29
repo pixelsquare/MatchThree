@@ -11,7 +11,7 @@ import flambe.script.Sequence;
 import matchthree.main.element.block.MThreeBlock;
 import matchthree.main.element.GameElement;
 import matchthree.main.element.grid.IGrid;
-import matchthree.main.element.MThreeMain;
+import matchthree.main.MThreeMain;
 import matchthree.pxlSq.Utils;
 import matchthree.main.element.grid.MThreeGrid;
 import matchthree.main.utils.MThreeUtils;
@@ -24,19 +24,21 @@ class MThreeTile extends GameElement implements IGrid
 {
 	public var idx(default, null): Int;
 	public var idy(default, null): Int;
+	public var isKinematic(default, null): Bool;
 	public var isAnimating: Bool;
 	
 	private var tileTexture: Texture;
 	private var tileImage: ImageSprite;
-	
-	public var fillCount: Int = 1;
 
 	public function new() {
 		super();
 	}
 	
-	public function SetFillCount(value: Int): Void {
-		this.fillCount = value;
+	public function SetIsKinematic(isKinematic: Bool): Void {
+		if (this.isKinematic == isKinematic)
+			return;
+		
+		this.isKinematic = isKinematic;
 	}
 	
 	public function GetTileType(): TileType {
@@ -61,7 +63,10 @@ class MThreeTile extends GameElement implements IGrid
 	}
 	
 	public function UpdateDropPosition(): Void {
-		if ((idy + 1) >= GameData.GRID_COLS || isAnimating)
+		if ((idy + 1) >= GameConstants.GRID_COLS)
+			return;
+			
+		if (isAnimating || isKinematic)
 			return;
 			
 		var mThreeMain: MThreeMain = parent.get(MThreeMain);
@@ -79,23 +84,22 @@ class MThreeTile extends GameElement implements IGrid
 			
 			var tileScript: Script = new Script();
 			tileScript.run(new Sequence([
-				new AnimateTo(this.y, nextBlock.grid.y._, GameData.TILE_TWEEN_SPEED),
+				new AnimateTo(this.y, nextBlock.grid.y._, GameConstants.TWEEN_SPEED),
 				new CallFunction(function() {
 					SetGridID(nextBlock.grid.idx, nextBlock.grid.idy);
-					elementEntity.removeChild(new Entity().add(tileScript));
-					tileScript.dispose();
+					RemoveAndDispose(tileScript);
 					isAnimating = false;
 				})
 			]));
-			elementEntity.addChild(new Entity().add(tileScript));
+			AddToEntity(tileScript);
 		}
 	}
 	
 	public function UpdateFillRight(): Void {
-		if ((idx + 1) >= GameData.GRID_ROWS || (idy + 1) > GameData.GRID_COLS)
+		if ((idx + 1) >= GameConstants.GRID_ROWS || (idy + 1) > GameConstants.GRID_COLS)
 			return;
 			
-		if (isAnimating || fillCount == 1)
+		if (isAnimating || isKinematic)
 			return;
 			
 		var mThreeMain: MThreeMain = parent.get(MThreeMain);
@@ -103,12 +107,12 @@ class MThreeTile extends GameElement implements IGrid
 			return;
 			
 		var rightBlock: MThreeBlock = mThreeMain.gridBlocks[idx + 1][idy];
-		var bottomBlock: MThreeBlock = mThreeMain.gridBlocks[idx][GameData.GRID_COLS - 1];
+		var bottomBlock: MThreeBlock = mThreeMain.gridBlocks[idx][GameConstants.GRID_COLS - 1];
 		
 		if (rightBlock == null || bottomBlock == null)
 			return;
 			
-		if (rightBlock.isBlocked || rightBlock.IsBlockEmpty()) {
+		if (rightBlock.isBlocked || bottomBlock.IsBlockEmpty()) {
 			var bottomRight: MThreeBlock = mThreeMain.gridBlocks[idx + 1][idy + 1];
 			if (bottomRight == null)
 				return;
@@ -122,18 +126,16 @@ class MThreeTile extends GameElement implements IGrid
 				var tileScript: Script = new Script();
 				tileScript.run(new Sequence([
 					new Parallel([
-						new AnimateTo(this.x, bottomRight.grid.x._, GameData.TILE_TWEEN_SPEED),
-						new AnimateTo(this.y, bottomRight.grid.y._, GameData.TILE_TWEEN_SPEED)
+						new AnimateTo(this.x, bottomRight.grid.x._, GameConstants.TWEEN_SPEED),
+						new AnimateTo(this.y, bottomRight.grid.y._, GameConstants.TWEEN_SPEED)
 					]),
 					new CallFunction(function() {
 						SetGridID(bottomRight.grid.idx, bottomRight.grid.idy);
-						elementEntity.removeChild(new Entity().add(tileScript));
-						tileScript.dispose();
-						MThreeUtils.SetTilesFillCount(mThreeMain.tileList, 1);
+						RemoveAndDispose(tileScript);
 						isAnimating = false;
 					})
 				]));
-				elementEntity.addChild(new Entity().add(tileScript));
+				AddToEntity(tileScript);
 			}
 		}
 	}
@@ -142,7 +144,7 @@ class MThreeTile extends GameElement implements IGrid
 		if ((idx - 1) < 0 || (idy - 1) < 0)
 			return;
 			
-		if (isAnimating || fillCount == 0)
+		if (isAnimating || isKinematic)
 			return;
 
 		var mThreeMain: MThreeMain = parent.get(MThreeMain);
@@ -150,12 +152,12 @@ class MThreeTile extends GameElement implements IGrid
 			return;
 
 		var leftBlock: MThreeBlock = mThreeMain.gridBlocks[idx - 1][idy];
-		var bottomBlock: MThreeBlock = mThreeMain.gridBlocks[idx][GameData.GRID_COLS - 1];
+		var bottomBlock: MThreeBlock = mThreeMain.gridBlocks[idx][GameConstants.GRID_COLS - 1];
 		
 		if (leftBlock == null || bottomBlock == null)
 			return;
 			
-		if (leftBlock.isBlocked || leftBlock.IsBlockEmpty()) {
+		if (leftBlock.isBlocked || bottomBlock.IsBlockEmpty()) {
 			var bottomLeft: MThreeBlock = mThreeMain.gridBlocks[idx - 1][idy + 1];
 			if (bottomLeft == null)
 				return;
@@ -169,18 +171,16 @@ class MThreeTile extends GameElement implements IGrid
 				var tileScript: Script = new Script();
 				tileScript.run(new Sequence([
 					new Parallel([
-						new AnimateTo(this.x, bottomLeft.grid.x._, GameData.TILE_TWEEN_SPEED),
-						new AnimateTo(this.y, bottomLeft.grid.y._, GameData.TILE_TWEEN_SPEED)
+						new AnimateTo(this.x, bottomLeft.grid.x._, GameConstants.TWEEN_SPEED),
+						new AnimateTo(this.y, bottomLeft.grid.y._, GameConstants.TWEEN_SPEED)
 					]),
 					new CallFunction(function() {
 						SetGridID(bottomLeft.grid.idx, bottomLeft.grid.idy);
-						elementEntity.removeChild(new Entity().add(tileScript));
-						tileScript.dispose();
-						MThreeUtils.SetTilesFillCount(mThreeMain.tileList, 0);
+						RemoveAndDispose(tileScript);
 						isAnimating = false;
 					})
 				]));
-				elementEntity.addChild(new Entity().add(tileScript));
+				AddToEntity(tileScript);
 			}
 		}
 	}

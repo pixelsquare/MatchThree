@@ -61,6 +61,10 @@ class GameScreen extends DataManager
 		return "";
 	}
 	
+	private function HideBackground(): Void {
+		screenBackground.visible = false;
+	}
+	
 	private function HideTitleText(): Void {
 		screenTitleText.visible = false;
 	}

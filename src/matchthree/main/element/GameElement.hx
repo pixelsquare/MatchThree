@@ -102,11 +102,23 @@ class GameElement extends Component
 		return "Size [" + this.width + "," + this.height + "]";
 	}
 	
-	private function AddToEntity(component: Component): Void {
+	public function AddToEntity(component: Component): Void {
 		if (component == null)
 			return;
 			
 		elementEntity.addChild(new Entity().add(component));
+	}
+	
+	public  function RemoveToEntity(component: Component): Void {
+		if (component == null)
+			return;
+		
+		elementEntity.removeChild(new Entity().add(component));
+	}
+	
+	public  function RemoveAndDispose(component: Component): Void {
+		RemoveToEntity(component);
+		component.dispose();
 	}
 	
 	override public function onAdded() {

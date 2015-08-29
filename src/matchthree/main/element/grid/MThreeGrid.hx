@@ -3,6 +3,7 @@ package matchthree.main.element.grid;
 import flambe.display.ImageSprite;
 import flambe.display.Texture;
 import matchthree.main.element.GameElement;
+import matchthree.main.MThreeMain;
 import matchthree.pxlSq.Utils;
 import matchthree.name.AssetName;
 
@@ -33,14 +34,14 @@ class MThreeGrid extends GameElement implements IGrid
 	}
 	
 	public function ShowGrid(): Void {
-		if (background == null)
+		if (background == null || background.visible)
 			return;
 	
 		background.visible = true;
 	}
 	
 	public function HideGrid(): Void {
-		if (background == null)
+		if (background == null || !background.visible)
 			return;
 		
 		background.visible = false;

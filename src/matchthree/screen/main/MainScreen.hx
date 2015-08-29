@@ -14,7 +14,7 @@ import flambe.System;
 import flambe.input.Key;
 import flambe.asset.AssetPack;
 import flambe.subsystem.StorageSystem;
-import matchthree.main.element.MThreeMain;
+import matchthree.main.MThreeMain;
 import matchthree.screen.GameButton;
 
 import matchthree.name.AssetName;
@@ -61,9 +61,12 @@ class MainScreen extends GameScreen
 		screenEntity.addChild(new Entity().add(scoreBoard));
 		
 		var scoreFont: Font = new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32);
-		var scoreText: TextSprite = new TextSprite(scoreFont, "Score:   10");
-		scoreText.setXY(scoreBoard.x._,	scoreBoard.y._);
-		scoreText.centerAnchor();
+		var scoreText: TextSprite = new TextSprite(scoreFont, "Score: 0");
+		scoreText.setXY(
+			scoreBoard.x._ - (scoreBoard.getNaturalWidth() * 0.6) + (scoreText.getNaturalWidth() / 2),	
+			scoreBoard.y._ - (scoreBoard.getNaturalHeight() * 0.6) + (scoreText.getNaturalHeight() / 2)
+		);
+		//scoreText.centerAnchor();
 		screenEntity.addChild(new Entity().add(scoreText));
 		
 		var timeBoard: ImageSprite = new ImageSprite(gameAsset.getTexture(AssetName.ASSET_BOARD_SQUARE));
@@ -89,7 +92,7 @@ class MainScreen extends GameScreen
 				gameAsset.getTexture(AssetName.ASSET_BUTTON_DOWN_PAUSE)
 			],
 			function() {
-				Utils.ConsoleLog("PAUSED!");
+				SceneManager.ShowPauseScreen();
 			}
 		);
 		
@@ -106,7 +109,25 @@ class MainScreen extends GameScreen
 		matchThreeMain.SetParent(screenEntity);
 		screenEntity.addChild(new Entity().add(matchThreeMain));
 		
+		matchThreeMain.gameTime.watch(function(newTime: Float, oldTime: Float) {
+			timeText.text = "Time:   " + Utils.ToMMSS(newTime);
+		});
+		
+		matchThreeMain.gameScore.watch(function(newScore: Float, oldScore: Float) {
+			scoreText.text = "Score: " + Std.int(newScore);
+		});
+		
 		//Utils.ConsoleLog(screenEntity.toString());
+		
+		System.keyboard.down.connect(function(event: KeyboardEvent) {
+			if (event.key == Key.P) {
+				SceneManager.ShowPauseScreen();
+			}
+			
+			if (event.key == Key.G) {
+				SceneManager.ShowGameOverScreen();
+			}
+		});
 		
 		return screenEntity;
 	}

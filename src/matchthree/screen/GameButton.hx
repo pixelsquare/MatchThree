@@ -90,6 +90,7 @@ class GameButton extends GameElement
 			buttonSprite.pointerUp.connect(function(event: PointerEvent) {
 				buttonImage.texture = (buttonHoverTexture != null) ? buttonHoverTexture : buttonNormalTexture;
 				
+				Utils.ConsoleLog("[BUTTON] " + buttonText);
 				if (buttonFunc != null) {
 					buttonFunc();
 				}
