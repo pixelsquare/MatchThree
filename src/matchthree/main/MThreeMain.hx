@@ -1,5 +1,6 @@
 package matchthree.main;
 
+import flambe.display.Font;
 import flambe.input.KeyboardEvent;
 import flambe.input.PointerEvent;
 import flambe.math.Point;
@@ -17,6 +18,7 @@ import matchthree.main.element.tile.MThreeTileCube;
 import matchthree.main.element.tile.MThreeTileData;
 import matchthree.core.DataManager;
 import flambe.System;
+import matchthree.main.utils.MThreePopup;
 import matchthree.pxlSq.Utils;
 import matchthree.main.element.tile.TileDataType;
 import matchthree.name.AssetName;
@@ -27,6 +29,7 @@ import matchthree.main.element.GameElement;
 import flambe.input.Key;
 import flambe.animation.AnimatedFloat;
 import matchthree.core.SceneManager;
+import matchthree.name.FontName;
 
 /**
  * ...
@@ -273,6 +276,7 @@ class MThreeMain extends GameElement
 			gameScore._ += MThreeUtils.GetScore(tiles);
 			
 			for (tile in tiles) {
+				//tile.AnimateAndDispose();
 				tile.dispose();
 			}
 		}
@@ -313,7 +317,7 @@ class MThreeMain extends GameElement
 	public function RepeatCleaning(): Void {
 		var stageClear: Script = new Script();
 		stageClear.run(new Repeat(new Sequence([
-			new Delay(0.5),
+			new Delay(GameConstants.CHECK_DELAY),
 			new CallFunction(function() {
 				if (!MThreeUtils.HasMovingBlocks() && tileList.length == (GameConstants.GRID_ROWS * GameConstants.GRID_COLS)) {
 					SetBoardDirty();
@@ -322,6 +326,15 @@ class MThreeMain extends GameElement
 			})
 		])));
 		AddToEntity(stageClear);
+	}
+	
+	public function ShowPopup(tiles: Array<MThreeTileCube>, text: String): Void {
+		for (tile in tiles) {
+			var popup: MThreePopup = new MThreePopup(text, new Font(dataManager.gameAsset, FontName.FONT_UNCERTAIN_SANS_32));
+			popup.SetParent(owner);
+			popup.SetGridID(tile.idx, tile.idy, true);
+			AddToEntity(popup);
+		}
 	}
 	
 	override public function onStart() {
@@ -337,6 +350,11 @@ class MThreeMain extends GameElement
 		// Making sure that when we initialize the board
 		// it doesn't contain any matches
 		InitBoard();
+		
+		//var popup: MThreePopup = new MThreePopup("300", new Font(dataManager.gameAsset, FontName.FONT_UNCERTAIN_SANS_32));
+		//popup.SetParent(owner);
+		//popup.SetGridID(0, 0, true);
+		//AddToEntity(popup);
 		
 		System.keyboard.down.connect(function(event: KeyboardEvent) {
 			if (event.key == Key.Space) {

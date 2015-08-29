@@ -185,6 +185,22 @@ class MThreeTile extends GameElement implements IGrid
 		}
 	}
 	
+	public function AnimateAndDispose(): Void {
+		var script: Script = new Script();
+		script.run(new Sequence([
+			new Parallel([
+				new AnimateTo(this.alpha, 0.0, 0.2),
+				new AnimateTo(this.scaleX, 0.0, 0.2),
+				new AnimateTo(this.scaleY, 0.0, 0.2)
+			]),
+			new CallFunction(function() {
+				RemoveAndDispose(script);
+				dispose();
+			})
+		]));
+		AddToEntity(script);
+	}
+	
 	override public function onUpdate(dt:Float) {
 		super.onUpdate(dt);
 		if (tileImage != null) {

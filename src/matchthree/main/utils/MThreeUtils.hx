@@ -373,12 +373,15 @@ class MThreeUtils
 		
 		if (tiles.length < 4) {
 			score = tiles.length * GameConstants.TILE_SCORE;
+			mThreeMain.ShowPopup(tiles, GameConstants.TILE_SCORE + "");
 		}
 		else if (tiles.length > 4) {
 			score = tiles.length * GameConstants.TILE_SCORE * 3;
+			mThreeMain.ShowPopup(tiles, (GameConstants.TILE_SCORE * 3) + "");
 		}
 		else {
 			score = tiles.length * GameConstants.TILE_SCORE * 2;
+			mThreeMain.ShowPopup(tiles, (GameConstants.TILE_SCORE * 2) + "");
 		}
 		
 		return score;
