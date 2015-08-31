@@ -2,10 +2,9 @@ package matchthree.main.element.grid;
 
 import flambe.display.ImageSprite;
 import flambe.display.Texture;
+
 import matchthree.main.element.GameElement;
 import matchthree.main.MThreeMain;
-import matchthree.pxlSq.Utils;
-import matchthree.name.AssetName;
 
 /**
  * ...

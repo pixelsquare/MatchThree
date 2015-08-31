@@ -1,21 +1,21 @@
 package matchthree.screen.main;
 
+import flambe.asset.AssetPack;
 import flambe.display.Font;
 import flambe.display.ImageSprite;
 import flambe.display.Sprite;
 import flambe.display.TextSprite;
 import flambe.Entity;
-import flambe.System;
-import flambe.scene.Scene;
-import flambe.asset.AssetPack;
 import flambe.subsystem.StorageSystem;
-import matchthree.name.FontName;
-import matchthree.screen.GameButton;
+import flambe.System;
 
-import matchthree.name.AssetName;
-import matchthree.name.ScreenName;
-import matchthree.screen.GameScreen;
 import matchthree.core.SceneManager;
+import matchthree.name.AssetName;
+import matchthree.name.FontName;
+import matchthree.name.ScreenName;
+import matchthree.screen.GameButton;
+import matchthree.screen.GameScreen;
+
 
 /**
  * ...
@@ -120,6 +120,5 @@ class PauseScreen extends GameScreen
 	
 	override public function GetScreenName():String {
 		return ScreenName.SCREEN_PAUSE;
-	}
-	
+	}	
 }

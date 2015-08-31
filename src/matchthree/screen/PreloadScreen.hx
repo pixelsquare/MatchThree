@@ -7,13 +7,9 @@ import flambe.display.TextSprite;
 import flambe.Entity;
 import flambe.System;
 import flambe.util.Promise;
-import matchthree.core.DataManager;
 
-import matchthree.name.AssetName;
 import matchthree.name.FontName;
 import matchthree.name.ScreenName;
-
-import matchthree.pxlSq.Utils;
 
 /**
  * ...
@@ -36,8 +32,6 @@ class PreloadScreen extends GameScreen
 		screenEntity = super.CreateScreen();
 		screenBackground.color = 0x202020;
 		HideTitleText();
-		
-				//Utils.ConsoleLog((preloadPack == null) + "");
 		
 		var loadingEntity: Entity = new Entity();
 		var loadingFont: Font = new Font(gameAsset, FontName.FONT_VANADINE_32);

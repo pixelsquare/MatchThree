@@ -16,5 +16,5 @@ class GameConstants
 	public static inline var SWAP_THRESHOLD: Float = 20.0;
 	public static inline var TILE_SCORE: Int = 100;
 	
-	public static inline var CHECK_DELAY: Float = 0.5;
+	public static inline var CHECK_DELAY: Float = 0.75;
 }

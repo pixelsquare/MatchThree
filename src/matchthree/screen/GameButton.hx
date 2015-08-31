@@ -1,15 +1,12 @@
 package matchthree.screen;
 
-import flambe.Component;
 import flambe.display.Font;
 import flambe.display.ImageSprite;
 import flambe.display.Sprite;
 import flambe.display.TextSprite;
 import flambe.display.Texture;
-import flambe.Disposer;
-import flambe.Entity;
 import flambe.input.PointerEvent;
-import flambe.scene.Scene;
+
 import matchthree.main.element.GameElement;
 import matchthree.pxlSq.Utils;
 
@@ -30,16 +27,18 @@ class GameButton extends GameElement
 	private var buttonText: String;
 	
 	private var buttonSprite: Sprite;
+	private var buttonShowText: Bool;
 	
 	private var buttonFunc: Void->Void;
 	
-	public function new(buttonFont: Font, buttonText: String, textures: Array<Dynamic>, ?fn:Void->Void) {		
+	public function new(buttonFont: Font, buttonText: String, textures: Array<Dynamic>, ?fn:Void->Void, showText: Bool = true) {		
 		this.buttonTextFont = buttonFont;
 		this.buttonText = buttonText;
 		this.buttonNormalTexture = textures[0];
 		this.buttonHoverTexture = textures[1];
 		this.buttonDownTexture = textures[2];
 		this.buttonFunc = fn;
+		this.buttonShowText = showText;
 		
 		super();
 	}
@@ -50,7 +49,7 @@ class GameButton extends GameElement
 		buttonImage = new ImageSprite(buttonNormalTexture);
 		buttonImage.centerAnchor();
 		
-		if(buttonTextFont != null && buttonText != "") {
+		if(buttonShowText) {
 			buttonTextSprite = new TextSprite(buttonTextFont, buttonText);
 			buttonTextSprite.centerAnchor();
 		}		

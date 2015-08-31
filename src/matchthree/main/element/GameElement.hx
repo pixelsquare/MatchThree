@@ -1,11 +1,10 @@
 package matchthree.main.element;
 
-import flambe.Component;
 import flambe.animation.AnimatedFloat;
+import flambe.Component;
 import flambe.Disposer;
 import flambe.Entity;
 import flambe.scene.Scene;
-import matchthree.pxlSq.Utils;
 
 /**
  * ...
@@ -102,11 +101,11 @@ class GameElement extends Component
 		return "Size [" + this.width + "," + this.height + "]";
 	}
 	
-	public function AddToEntity(component: Component): Void {
+	public function AddToEntity(component: Component, append: Bool = true): Void {
 		if (component == null)
 			return;
 			
-		elementEntity.addChild(new Entity().add(component));
+		elementEntity.addChild(new Entity().add(component), append);
 	}
 	
 	public  function RemoveToEntity(component: Component): Void {

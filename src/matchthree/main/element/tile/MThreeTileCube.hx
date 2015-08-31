@@ -1,7 +1,6 @@
 package matchthree.main.element.tile;
 
 import flambe.display.ImageSprite;
-import matchthree.main.MThreeMain;
 
 /**
  * ...

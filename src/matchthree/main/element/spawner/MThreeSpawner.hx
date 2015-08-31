@@ -7,12 +7,12 @@ import flambe.script.CallFunction;
 import flambe.script.Parallel;
 import flambe.script.Script;
 import flambe.script.Sequence;
+
 import matchthree.main.element.block.MThreeBlock;
 import matchthree.main.element.GameElement;
 import matchthree.main.element.grid.IGrid;
-import matchthree.main.MThreeMain;
 import matchthree.main.element.tile.MThreeTile;
-import matchthree.pxlSq.Utils;
+import matchthree.main.MThreeMain;
 
 /**
  * ...

@@ -1,9 +1,7 @@
 package matchthree.main.element.block;
 
-import matchthree.main.element.GameElement;
 import matchthree.main.element.grid.MThreeGrid;
 import matchthree.main.element.tile.MThreeTile;
-import matchthree.pxlSq.Utils;
 
 /**
  * ...

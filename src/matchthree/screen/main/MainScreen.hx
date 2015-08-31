@@ -1,29 +1,23 @@
 package matchthree.screen.main;
 
-import flambe.display.FillSprite;
+import flambe.asset.AssetPack;
 import flambe.display.Font;
 import flambe.display.ImageSprite;
 import flambe.display.TextSprite;
 import flambe.Entity;
-import flambe.input.KeyboardEvent;
-import flambe.script.CallFunction;
-import flambe.script.Delay;
-import flambe.script.Script;
-import flambe.script.Sequence;
-import flambe.System;
 import flambe.input.Key;
-import flambe.asset.AssetPack;
+import flambe.input.KeyboardEvent;
 import flambe.subsystem.StorageSystem;
-import matchthree.main.MThreeMain;
-import matchthree.screen.GameButton;
+import flambe.System;
 
-import matchthree.name.AssetName;
-import matchthree.name.ScreenName;
-import matchthree.screen.GameScreen;
 import matchthree.core.SceneManager;
-import matchthree.pxlSq.Utils;
-import matchthree.core.GameManager;
+import matchthree.main.MThreeMain;
+import matchthree.name.AssetName;
 import matchthree.name.FontName;
+import matchthree.name.ScreenName;
+import matchthree.pxlSq.Utils;
+import matchthree.screen.GameButton;
+import matchthree.screen.GameScreen;
 
 /**
  * ...
@@ -85,7 +79,7 @@ class MainScreen extends GameScreen
 		
 		gamePauseBtn = new GameButton(
 			null,
-			"",
+			"Pause",
 			[
 				gameAsset.getTexture(AssetName.ASSET_BUTTON_UP_PAUSE),
 				null,
@@ -93,7 +87,8 @@ class MainScreen extends GameScreen
 			],
 			function() {
 				SceneManager.ShowPauseScreen();
-			}
+			},
+			false
 		);
 		
 		gamePauseBtn.SetXY(
@@ -104,9 +99,8 @@ class MainScreen extends GameScreen
 		screenEntity.addChild(new Entity().add(gamePauseBtn));
 		
 		matchThreeMain = new MThreeMain(this);
-		//matchThreeMain.SetXY(boardImage.x._ * 1.08, boardImage.y._ * 1.08);
-		matchThreeMain.SetXY(boardImage.x._, boardImage.y._);	
 		matchThreeMain.SetParent(screenEntity);
+		matchThreeMain.SetXY(boardImage.x._, boardImage.y._);	
 		screenEntity.addChild(new Entity().add(matchThreeMain));
 		
 		matchThreeMain.gameTime.watch(function(newTime: Float, oldTime: Float) {
@@ -117,8 +111,7 @@ class MainScreen extends GameScreen
 			scoreText.text = "Score: " + Std.int(newScore);
 		});
 		
-		//Utils.ConsoleLog(screenEntity.toString());
-		
+		#if html
 		System.keyboard.down.connect(function(event: KeyboardEvent) {
 			if (event.key == Key.P) {
 				SceneManager.ShowPauseScreen();
@@ -128,13 +121,12 @@ class MainScreen extends GameScreen
 				SceneManager.ShowGameOverScreen();
 			}
 		});
+		#end
 		
 		return screenEntity;
 	}
 	
-	override public function GetScreenName():String 
-	{
+	override public function GetScreenName(): String {
 		return ScreenName.SCREEN_MAIN;
 	}
-	
 }

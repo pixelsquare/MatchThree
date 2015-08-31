@@ -13,7 +13,6 @@ import flash.external.ExternalInterface;
  */
 class Utils
 {
-
 	public static function ConsoleLog(str: Dynamic): Void {
 		#if flash
 		ExternalInterface.call("console.log", str);

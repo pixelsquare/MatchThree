@@ -1,7 +1,6 @@
 package matchthree.core;
 
 import flambe.asset.AssetPack;
-import flambe.Component;
 import flambe.subsystem.StorageSystem;
 
 /**

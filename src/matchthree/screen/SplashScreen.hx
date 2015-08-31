@@ -10,13 +10,13 @@ import flambe.script.Delay;
 import flambe.script.Script;
 import flambe.script.Sequence;
 import flambe.System;
-import matchthree.core.DataManager;
 
 import matchthree.core.SceneManager;
 import matchthree.name.AssetName;
 import matchthree.name.FontName;
 import matchthree.name.ScreenName;
 import matchthree.screen.GameScreen;
+
 
 /**
  * ...
@@ -65,5 +65,4 @@ class SplashScreen extends GameScreen
 	override public function GetScreenName(): String {
 		return ScreenName.SCREEN_SPLASH;
 	}
-	
 }

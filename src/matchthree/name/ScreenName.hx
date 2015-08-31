@@ -16,4 +16,5 @@ class ScreenName
 	public static inline var SCREEN_MAIN: 				String = "Main";
 	public static inline var SCREEN_PAUSE: 				String = "Pause";
 	public static inline var SCREEN_GAME_OVER: 			String = "Game Over";
+	public static inline var SCREEN_NO_MOVES: 			String = "No Moves";
 }

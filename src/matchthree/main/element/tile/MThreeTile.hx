@@ -2,19 +2,17 @@ package matchthree.main.element.tile;
 
 import flambe.display.ImageSprite;
 import flambe.display.Texture;
-import flambe.Entity;
 import flambe.script.AnimateTo;
 import flambe.script.CallFunction;
 import flambe.script.Parallel;
 import flambe.script.Script;
 import flambe.script.Sequence;
+
 import matchthree.main.element.block.MThreeBlock;
 import matchthree.main.element.GameElement;
 import matchthree.main.element.grid.IGrid;
-import matchthree.main.MThreeMain;
-import matchthree.pxlSq.Utils;
 import matchthree.main.element.grid.MThreeGrid;
-import matchthree.main.utils.MThreeUtils;
+import matchthree.main.MThreeMain;
 
 /**
  * ...
@@ -106,13 +104,15 @@ class MThreeTile extends GameElement implements IGrid
 		if (mThreeMain == null)
 			return;
 			
+		var upperBlock: MThreeBlock = mThreeMain.gridBlocks[idx][idy - 1];
 		var rightBlock: MThreeBlock = mThreeMain.gridBlocks[idx + 1][idy];
-		var bottomBlock: MThreeBlock = mThreeMain.gridBlocks[idx][GameConstants.GRID_COLS - 1];
 		
-		if (rightBlock == null || bottomBlock == null)
+		if (upperBlock == null || rightBlock == null)
 			return;
 			
-		if (rightBlock.isBlocked && bottomBlock.IsBlockEmpty()) {
+		if ((rightBlock.isBlocked && !upperBlock.IsBlockEmpty()) ||
+			(rightBlock.IsBlockEmpty() && upperBlock.isBlocked) ||
+			(rightBlock.IsBlockEmpty() && upperBlock.IsBlockEmpty())) {
 			var bottomRight: MThreeBlock = mThreeMain.gridBlocks[idx + 1][idy + 1];
 			if (bottomRight == null)
 				return;
@@ -151,13 +151,15 @@ class MThreeTile extends GameElement implements IGrid
 		if (mThreeMain == null)
 			return;
 
+		var upperBlock: MThreeBlock = mThreeMain.gridBlocks[idx][idy - 1];
 		var leftBlock: MThreeBlock = mThreeMain.gridBlocks[idx - 1][idy];
-		var bottomBlock: MThreeBlock = mThreeMain.gridBlocks[idx][GameConstants.GRID_COLS - 1];
 		
-		if (leftBlock == null || bottomBlock == null)
+		if (upperBlock == null || leftBlock == null)
 			return;
 			
-		if (leftBlock.isBlocked && bottomBlock.IsBlockEmpty()) {
+		if ((leftBlock.isBlocked && !upperBlock.IsBlockEmpty()) ||
+			(leftBlock.IsBlockEmpty() && upperBlock.isBlocked) ||
+			(leftBlock.IsBlockEmpty() && upperBlock.IsBlockEmpty())) {
 			var bottomLeft: MThreeBlock = mThreeMain.gridBlocks[idx - 1][idy + 1];
 			if (bottomLeft == null)
 				return;

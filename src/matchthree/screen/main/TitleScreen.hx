@@ -1,5 +1,6 @@
 package matchthree.screen.main;
 
+import flambe.animation.Ease;
 import flambe.asset.AssetPack;
 import flambe.display.Font;
 import flambe.display.ImageSprite;
@@ -12,7 +13,6 @@ import flambe.script.Script;
 import flambe.script.Sequence;
 import flambe.subsystem.StorageSystem;
 import flambe.System;
-import flambe.animation.Ease;
 
 import matchthree.core.SceneManager;
 import matchthree.name.AssetName;
@@ -97,8 +97,7 @@ class TitleScreen extends GameScreen
 		return screenEntity;
 	}
 	
-	override public function GetScreenName():String 
-	{
+	override public function GetScreenName(): String {
 		return ScreenName.SCREEN_TITLE;
 	}
 }

@@ -1,17 +1,15 @@
 package matchthree;
-import flambe.asset.AssetPack;
-import flambe.util.Promise;
-import matchthree.core.GameManager;
-import matchthree.core.SceneManager;
-import matchthree.screen.PreloadScreen;
-import matchthree.screen.SplashScreen;
 
-import flambe.System;
+import flambe.asset.AssetPack;
 import flambe.asset.Manifest;
 import flambe.scene.Director;
-import matchthree.core.DataManager;
+import flambe.System;
+import flambe.util.Promise;
 
+import matchthree.core.SceneManager;
 import matchthree.pxlSq.Utils;
+import matchthree.screen.PreloadScreen;
+import matchthree.screen.SplashScreen;
 
 class Main
 {
@@ -34,7 +32,6 @@ class Main
 			promise.get(function(mainPack: AssetPack) {
 				Utils.ConsoleLog("Main pack loaded");
 				
-				var gameManager: GameManager = new GameManager();
 				sceneManager.InitScreens(mainPack, System.storage);
 				
 				#if flash				
@@ -42,6 +39,7 @@ class Main
 					//SceneManager.ShowMainScreen(true);
 				#else
 					SceneManager.ShowScreen(new SplashScreen(preloadPack, 2), true);
+					//SceneManager.ShowMainScreen(true);
 				#end
 				
 			});

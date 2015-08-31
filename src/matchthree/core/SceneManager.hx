@@ -6,14 +6,14 @@ import flambe.Entity;
 import flambe.scene.Director;
 import flambe.scene.FadeTransition;
 import flambe.subsystem.StorageSystem;
+import matchthree.pxlSq.Utils;
 
 import matchthree.screen.GameScreen;
 import matchthree.screen.main.GameOverScreen;
 import matchthree.screen.main.MainScreen;
+import matchthree.screen.main.NoMovesScreen;
 import matchthree.screen.main.PauseScreen;
 import matchthree.screen.main.TitleScreen;
-
-import matchthree.pxlSq.Utils;
 
 /**
  * ...
@@ -25,6 +25,7 @@ class SceneManager
 	public var gameMainScreen(default, null): MainScreen;
 	public var gamePauseScreen(default, null): PauseScreen;
 	public var gameOverScreen(default, null): GameOverScreen;
+	public var gameNoMovesScreen(default, null): NoMovesScreen;
 	
 	private var gameScreenList: Array<GameScreen>;
 	private var gameDirector: Director;
@@ -49,6 +50,7 @@ class SceneManager
 		AddGameScreen(gameMainScreen = new MainScreen(assetPack, storage));
 		AddGameScreen(gamePauseScreen = new PauseScreen(assetPack, storage));
 		AddGameScreen(gameOverScreen = new GameOverScreen(assetPack, storage));
+		AddGameScreen(gameNoMovesScreen = new NoMovesScreen(assetPack, storage));
 	}
 	
 	private function AddGameScreen(screen: GameScreen) : Void {
@@ -94,9 +96,15 @@ class SceneManager
 		instance.gameDirector.pushScene(instance.gamePauseScreen.CreateScreen());
 	}
 	
-	public static function ShowGameOverScreen(willANimate: Bool = false) : Void {
+	public static function ShowGameOverScreen(willAnimate: Bool = false) : Void {
 		Utils.ConsoleLog("SHOWING [" + instance.gameOverScreen.GetScreenName() + "]");
 		UnwindToCurScene();
 		instance.gameDirector.pushScene(instance.gameOverScreen.CreateScreen());
+	}
+	
+	public static function ShowNoMovesScreen(willAnimate: Bool = false): Void {
+		Utils.ConsoleLog("SHOWING [" + instance.gameNoMovesScreen.GetScreenName() + "]");
+		UnwindToCurScene();
+		instance.gameDirector.pushScene(instance.gameNoMovesScreen.CreateScreen());
 	}
 }

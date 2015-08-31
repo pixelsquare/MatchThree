@@ -6,8 +6,10 @@ import flambe.script.AnimateBy;
 import flambe.script.AnimateTo;
 import flambe.script.CallFunction;
 import flambe.script.Parallel;
+import flambe.script.Repeat;
 import flambe.script.Script;
 import flambe.script.Sequence;
+
 import matchthree.main.element.GameElement;
 import matchthree.main.element.grid.IGrid;
 import matchthree.main.element.grid.MThreeGrid;
@@ -26,9 +28,12 @@ class MThreePopup extends GameElement implements IGrid
 	private var popupText: String;
 	private var popupTextSprite: TextSprite;
 	
-	public function new(text: String, font: Font) {		
+	private var shakeFly: Bool;
+	
+	public function new(text: String, font: Font, shakeFly: Bool = false) {		
 		this.popupText = text;
 		this.popupTextFont = font;
+		this.shakeFly = shakeFly;
 		
 		super();
 	}
@@ -44,19 +49,39 @@ class MThreePopup extends GameElement implements IGrid
 	
 	override public function onStart() {
 		super.onStart();
-		//popupTextSprite.setAlpha(0.0);
-		var flyScript: Script = new Script();
-		flyScript.run(new Sequence([
-			new Parallel([
-				new AnimateBy(this.y, -30, 1),
-				new AnimateTo(this.alpha, 0, 1)
-			]),
-			new CallFunction(function() {
-				RemoveAndDispose(flyScript);
-				dispose();
-			})
-		]));
-		AddToEntity(flyScript);
+		var popupScript: Script = new Script();
+		
+		if(shakeFly) {
+			popupScript.run(new Sequence([
+				new Repeat(new Sequence([
+					new AnimateBy(this.x, 5, 0.1),
+					new AnimateBy(this.x, -5, 0.1)
+					]), 
+				3),
+				new Parallel([
+					new AnimateBy(this.y, -30, 1),
+					new AnimateTo(this.alpha, 0, 1)
+				]),
+				new CallFunction(function() {
+					RemoveAndDispose(popupScript);
+					dispose();
+				})
+			]));
+		}
+		else {
+			popupScript.run(new Sequence([
+				new Parallel([
+					new AnimateBy(this.y, -30, 1),
+					new AnimateTo(this.alpha, 0, 1)
+				]),
+				new CallFunction(function() {
+					RemoveAndDispose(popupScript);
+					dispose();
+				})
+			]));
+		}
+		
+		AddToEntity(popupScript);
 	}
 	
 	override public function onUpdate(dt:Float) {

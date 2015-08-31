@@ -1,4 +1,5 @@
 package matchthree.main.utils;
+
 import flambe.asset.AssetPack;
 import flambe.display.Texture;
 import flambe.math.Point;
@@ -7,15 +8,14 @@ import flambe.script.CallFunction;
 import flambe.script.Parallel;
 import flambe.script.Script;
 import flambe.script.Sequence;
-import matchthree.main.MThreeMain;
-import matchthree.main.element.tile.TileDataType;
-import matchthree.main.element.tile.TileType;
-import matchthree.main.swapping.MThreeSwapDirection;
-import matchthree.name.AssetName;
+
 import matchthree.main.element.block.MThreeBlock;
 import matchthree.main.element.tile.MThreeTile;
-import matchthree.pxlSq.Utils;
 import matchthree.main.element.tile.MThreeTileCube;
+import matchthree.main.element.tile.TileDataType;
+import matchthree.main.MThreeMain;
+import matchthree.main.swapping.MThreeSwapDirection;
+import matchthree.name.AssetName;
 
 /**
  * ...
@@ -58,10 +58,24 @@ class MThreeUtils
 		}
 	}
 	
-	public static function SwapTile(direction: MThreeSwapDirection, tile: MThreeTile, ?fn: Void->Void): Void {
+	public static function GetBlockedAndEmptyCount(): Int {
+		var result: Int = 0;
+		
+		for (ii in 0...mThreeMain.gridBlocks.length) {
+			for (block in mThreeMain.gridBlocks[ii]) {
+				if (block.isBlocked || block.IsBlockEmpty()) {	
+					result++;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	public static function SwapTile(direction: MThreeSwapDirection, tile: MThreeTile, ?fn: Void->Void, animate: Bool = true): Void {
 		if (tile == null)
 			return;
-		
+			
 		var idx: Int = tile.idx;
 		var idy: Int = tile.idy;
 		
@@ -115,33 +129,50 @@ class MThreeUtils
 		var tmpCurIdx: Int = curBlock.grid.idx;
 		var tmpCurIdy: Int = curBlock.grid.idy;
 		
-		curTile.isAnimating = true;
-		otherTile.isAnimating = true;
+		if (animate) {
+			curTile.isAnimating = true;
+			otherTile.isAnimating = true;
 		
-		var swapScript = new Script();
-		swapScript.run(new Sequence([
-			new Parallel([
-				new AnimateTo(curTile.x, otherBlock.grid.x._, GameConstants.TWEEN_SPEED),
-				new AnimateTo(curTile.y, otherBlock.grid.y._, GameConstants.TWEEN_SPEED),
-				new AnimateTo(otherTile.x, tmpCurPos.x, GameConstants.TWEEN_SPEED),
-				new AnimateTo(otherTile.y, tmpCurPos.y, GameConstants.TWEEN_SPEED)
-			]),
-			new CallFunction(function() {
-				otherTile.SetGridID(curBlock.grid.idx, curBlock.grid.idy);
-				curTile.SetGridID(otherBlock.grid.idx, otherBlock.grid.idy);
-				
-				curBlock.SetBlockTile(otherTile);
-				otherBlock.SetBlockTile(curTile);
-				
-				mThreeMain.RemoveAndDispose(swapScript);
-				
-				curTile.isAnimating = false;
-				otherTile.isAnimating = false;
-				
-				if (fn != null) { fn(); }
-			})
-		]));
-		mThreeMain.AddToEntity(swapScript);
+			var swapScript = new Script();
+			swapScript.run(new Sequence([
+				new Parallel([
+					new AnimateTo(curTile.x, otherBlock.grid.x._, GameConstants.TWEEN_SPEED),
+					new AnimateTo(curTile.y, otherBlock.grid.y._, GameConstants.TWEEN_SPEED),
+					new AnimateTo(otherTile.x, tmpCurPos.x, GameConstants.TWEEN_SPEED),
+					new AnimateTo(otherTile.y, tmpCurPos.y, GameConstants.TWEEN_SPEED)
+				]),
+				new CallFunction(function() {
+					otherTile.SetGridID(curBlock.grid.idx, curBlock.grid.idy);
+					curTile.SetGridID(otherBlock.grid.idx, otherBlock.grid.idy);
+					
+					curBlock.SetBlockTile(otherTile);
+					otherBlock.SetBlockTile(curTile);
+					
+					mThreeMain.RemoveAndDispose(swapScript);
+					
+					curTile.isAnimating = false;
+					otherTile.isAnimating = false;
+					
+					if (fn != null) { fn(); }
+				})
+			]));
+			mThreeMain.AddToEntity(swapScript);
+		}
+		else {
+			curTile.x._ = otherBlock.grid.x._;
+			curTile.y._ = otherBlock.grid.y._;
+			
+			otherTile.x._ = tmpCurPos.x;
+			otherTile.y._ = tmpCurPos.y;
+			
+			otherTile.SetGridID(curBlock.grid.idx, curBlock.grid.idy);
+			curTile.SetGridID(otherBlock.grid.idx, otherBlock.grid.idy);
+			
+			curBlock.SetBlockTile(otherTile);
+			otherBlock.SetBlockTile(curTile);	
+			
+			if (fn != null) { fn(); }
+		}
 	}
 	
 	public static function GetTilesOfType(type: TileDataType): Array<MThreeTileCube> {
@@ -163,29 +194,87 @@ class MThreeUtils
 		var idy: Int = tile.idy;
 		
 		for (i in 1...(length + 1)) {
-			//Utils.ConsoleLog(((idx + 1) < GameConstants.GRID_ROWS) + " Right");
+			var block: MThreeBlock = null;
+			// Right
 			if ((idx + i) < GameConstants.GRID_ROWS) {
-				result.push(cast(mThreeMain.gridBlocks[idx + i][idy].tile, MThreeTileCube));
+				block = mThreeMain.gridBlocks[idx + i][idy];
+				if(!block.isBlocked && !block.IsBlockEmpty()) {
+					result.push(cast(block.tile, MThreeTileCube));
+				}
 			}
 			
-			//Utils.ConsoleLog(((idx - 1) >= 0) + " Left");
+			// Left
 			if ((idx - i) >= 0) {
-				result.push(cast(mThreeMain.gridBlocks[idx - i][idy].tile, MThreeTileCube));
+				block = mThreeMain.gridBlocks[idx - i][idy];
+				if(!block.isBlocked && !block.IsBlockEmpty()) {
+					result.push(cast(block.tile, MThreeTileCube));
+				}
 			}
 			
-			//Utils.ConsoleLog(((idy + 1) < GameConstants.GRID_COLS) + " Bottom");
+			// Bottom
 			if ((idy + i) < GameConstants.GRID_COLS) {
-				result.push(cast(mThreeMain.gridBlocks[idx][idy + i].tile, MThreeTileCube));
+				block = mThreeMain.gridBlocks[idx][idy + i];
+				if(!block.isBlocked && !block.IsBlockEmpty()) {
+					result.push(cast(block.tile, MThreeTileCube));
+				}
 			}
 			
-			//Utils.ConsoleLog(((idy - 1) >= 0) + " Up");
+			// Top
 			if ((idy - i) >= 0) {
-				result.push(cast(mThreeMain.gridBlocks[idx][idy - i].tile, MThreeTileCube));
+				block = mThreeMain.gridBlocks[idx][idy - i];
+				if(!block.isBlocked && !block.IsBlockEmpty()) {
+					result.push(cast(block.tile, MThreeTileCube));
+				}
 			}
+			
 		}
-
 		
 		return result;		
+	}
+	
+	public static function GetDiagonalTiles(tile: MThreeTileCube, length: Int): Array<MThreeTileCube> {
+		var result: Array<MThreeTileCube> = new Array<MThreeTileCube>();
+		
+		var idx: Int = tile.idx;
+		var idy: Int = tile.idy;
+		
+		for (i in 1...(length + 1)) {
+			var block: MThreeBlock = null;
+			
+			// Upper right
+			if ((idx + i) < GameConstants.GRID_ROWS && (idy - i) >= 0) {
+				block = mThreeMain.gridBlocks[idx + i][idy - i];
+				if (!block.isBlocked && !block.IsBlockEmpty()) {
+					result.push(cast(block.tile, MThreeTileCube));
+				}
+			}
+			
+			// Bottom Right
+			if ((idx + i) < GameConstants.GRID_ROWS && (idy + i) < GameConstants.GRID_COLS) {
+				block = mThreeMain.gridBlocks[idx + i][idy + i];
+				if (!block.isBlocked && !block.IsBlockEmpty()) {
+					result.push(cast(block.tile, MThreeTileCube));
+				}
+			}
+			
+			// Upper left
+			if ((idx - i) >= 0 && (idy - i) >= 0) {
+				block = mThreeMain.gridBlocks[idx - i][idy - i];
+				if (!block.isBlocked && !block.IsBlockEmpty()) {
+					result.push(cast(block.tile, MThreeTileCube));
+				}
+			}
+			
+			// Bottom Left
+			if ((idx - i) >= 0 && (idy + i) < GameConstants.GRID_COLS) {
+				block = mThreeMain.gridBlocks[idx - i][idy + i];
+				if (!block.isBlocked && !block.IsBlockEmpty()) {
+					result.push(cast(block.tile, MThreeTileCube));
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 	public static function GetHorizontal(tile: MThreeTileCube): Array<MThreeTileCube> {
@@ -195,8 +284,13 @@ class MThreeUtils
 		var idy: Int = tile.idy;
 		
 		var prevBlock: MThreeBlock = null;
-		while (idx > 0) {			
+		while (idx > 0) {
 			prevBlock = mThreeMain.gridBlocks[idx - 1][idy];
+			if (prevBlock.isBlocked || prevBlock.IsBlockEmpty()) {
+				idx--;
+				continue;
+			}
+			
 			if (cast(prevBlock.tile, MThreeTileCube).GetTileDataType() != tile.GetTileDataType())
 				break;
 				
@@ -207,18 +301,20 @@ class MThreeUtils
 		idx = tile.idx;
 		var nextBlock: MThreeBlock = null;
 		while (idx < (GameConstants.GRID_ROWS - 1)) {			
-			//Utils.ConsoleLog((idx + 1) + "");
 			nextBlock = mThreeMain.gridBlocks[idx + 1][idy];
+			if (nextBlock.isBlocked || nextBlock.IsBlockEmpty()) {
+				idx++;
+				continue;
+			}
+			
 			if (cast(nextBlock.tile, MThreeTileCube).GetTileDataType() != tile.GetTileDataType())
 				break;
 			
-			//if (!Lambda.has(result, cast(nextBlock.tile, MThreeTileCube))) {
-				result.push(cast(nextBlock.tile, MThreeTileCube));
-				idx++;
-			//}
+
+			result.push(cast(nextBlock.tile, MThreeTileCube));
+			idx++;
 		}
 		
-		//Utils.ConsoleLog(tile.GridIDToString() + " " + result.length);
 		return result;
 	}
 	
@@ -231,6 +327,11 @@ class MThreeUtils
 		var prevBlock: MThreeBlock = null;
 		while (idy > 0) {
 			prevBlock = mThreeMain.gridBlocks[idx][idy - 1];
+			if (prevBlock.isBlocked || prevBlock.IsBlockEmpty()) {
+				idy--;
+				continue;
+			}
+
 			if (cast(prevBlock.tile, MThreeTileCube).GetTileDataType() != tile.GetTileDataType())
 				break;
 				
@@ -242,6 +343,11 @@ class MThreeUtils
 		var nextBlock: MThreeBlock = null;
 		while (idy < (GameConstants.GRID_COLS - 1)) {
 			nextBlock = mThreeMain.gridBlocks[idx][idy + 1];
+			if (nextBlock.isBlocked || nextBlock.IsBlockEmpty()) {
+				idy++;
+				continue;
+			}
+				
 			if (cast(nextBlock.tile, MThreeTileCube).GetTileDataType() != tile.GetTileDataType())
 				break;
 				
@@ -273,7 +379,6 @@ class MThreeUtils
 						
 						horizontal.push(h);
 					}
-					//horizontal = horizontal.concat(hTiles);
 				}
 				
 				var vTiles: Array<MThreeTileCube> = GetVertical(tile);
@@ -286,7 +391,6 @@ class MThreeUtils
 							
 						vertical.push(v);
 					}
-					//vertical = vertical.concat(vTiles);
 				}
 			}
 			
@@ -324,36 +428,30 @@ class MThreeUtils
 		return result;
 	}
 	
-	public static function HasPossibleMoves(): Bool {
+	public static function HasPossbileMoves(): Bool {
+		var possbileMatches: Int = 0;
 		
-		for (dataType in Type.allEnums(TileDataType)) {
-			var tiles: Array<MThreeTileCube> = GetTilesOfType(dataType);
-			
-			for (tile in tiles) {
-				var crossedTiles: Array<MThreeTileCube> = GetCrossedTiles(tile, 2);
-				//crossedTiles = crossedTiles.concat(GetLongCrossedTiles(tile));
-				var typeCount: Map<TileDataType, Int> = new Map<TileDataType, Int>();
-				
-				//Utils.ConsoleLog(tile.GridIDToString());
-				var count: Int = 0;
-				for (t in crossedTiles) {
-					count = typeCount.get(t.GetTileDataType());
-					count++;
-					typeCount.set(t.GetTileDataType(), count);
+		for (x in 0...mThreeMain.gridBlocks.length) {
+			for (y in 0...mThreeMain.gridBlocks[x].length) {
+				if (x < GameConstants.GRID_ROWS) {
+					SwapTile(SWAP_RIGHT, mThreeMain.gridBlocks[x][y].tile, function() {
+						possbileMatches += GetAllMatches().length;
+						
+						SwapTile(SWAP_LEFT, mThreeMain.gridBlocks[x + 1][y].tile, false);
+					}, false);
 				}
 				
-				for (key in typeCount.keys()) {
-					if (typeCount.get(key) >= 3) {
-						return true;
-					}
-					//Utils.ConsoleLog(key + " " + typeCount.get(key));
+				if (y < GameConstants.GRID_COLS) {
+					SwapTile(SWAP_DOWN, mThreeMain.gridBlocks[x][y].tile, function() {
+						possbileMatches += GetAllMatches().length;
+						
+						SwapTile(SWAP_UP, mThreeMain.gridBlocks[x][y + 1].tile, false);
+					}, false);
 				}
-				
-				//Utils.ConsoleLog("---");
 			}
 		}
 		
-		return false;
+		return possbileMatches > 0;
 	}
 	
 	public static function HasMovingBlocks(): Bool {

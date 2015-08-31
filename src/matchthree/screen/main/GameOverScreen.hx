@@ -1,23 +1,21 @@
 package matchthree.screen.main;
 
+import flambe.animation.Ease;
+import flambe.asset.AssetPack;
 import flambe.display.Font;
+import flambe.display.ImageSprite;
+import flambe.display.Sprite;
 import flambe.display.TextSprite;
 import flambe.Entity;
-import flambe.System;
-import flambe.scene.Scene;
-import flambe.asset.AssetPack;
 import flambe.subsystem.StorageSystem;
-import flambe.display.Sprite;
-import flambe.display.ImageSprite;
-import flambe.display.Font;
-import matchthree.name.FontName;
+import flambe.System;
 
+import matchthree.core.SceneManager;
+import matchthree.main.GameConstants;
 import matchthree.name.AssetName;
+import matchthree.name.FontName;
 import matchthree.name.ScreenName;
 import matchthree.screen.GameScreen;
-import matchthree.main.GameConstants;
-import flambe.animation.Ease;
-import matchthree.core.SceneManager;
 
 /**
  * ...
@@ -127,8 +125,7 @@ class GameOverScreen extends GameScreen
 		menuEntity.addChild(new Entity().add(quitBtn));
 	}
 	
-	override public function GetScreenName():String {
+	override public function GetScreenName(): String {
 		return ScreenName.SCREEN_GAME_OVER;
 	}
-	
 }

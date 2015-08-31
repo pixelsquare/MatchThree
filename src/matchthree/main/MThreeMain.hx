@@ -1,6 +1,8 @@
 package matchthree.main;
 
+import flambe.animation.AnimatedFloat;
 import flambe.display.Font;
+import flambe.input.Key;
 import flambe.input.KeyboardEvent;
 import flambe.input.PointerEvent;
 import flambe.math.Point;
@@ -9,26 +11,24 @@ import flambe.script.Delay;
 import flambe.script.Repeat;
 import flambe.script.Script;
 import flambe.script.Sequence;
+import flambe.System;
 import flambe.util.Signal1;
+
+import matchthree.core.DataManager;
+import matchthree.core.SceneManager;
+import matchthree.main.element.block.MThreeBlock;
+import matchthree.main.element.GameElement;
 import matchthree.main.element.grid.IGrid;
 import matchthree.main.element.grid.MThreeGrid;
 import matchthree.main.element.spawner.MThreeSpawner;
 import matchthree.main.element.tile.MThreeTile;
 import matchthree.main.element.tile.MThreeTileCube;
 import matchthree.main.element.tile.MThreeTileData;
-import matchthree.core.DataManager;
-import flambe.System;
-import matchthree.main.utils.MThreePopup;
-import matchthree.pxlSq.Utils;
 import matchthree.main.element.tile.TileDataType;
-import matchthree.name.AssetName;
-import matchthree.main.utils.MThreeUtils;
-import matchthree.main.element.block.MThreeBlock;
 import matchthree.main.swapping.MThreeSwapDirection;
-import matchthree.main.element.GameElement;
-import flambe.input.Key;
-import flambe.animation.AnimatedFloat;
-import matchthree.core.SceneManager;
+import matchthree.main.utils.MThreePopup;
+import matchthree.main.utils.MThreeUtils;
+import matchthree.name.AssetName;
 import matchthree.name.FontName;
 
 /**
@@ -57,18 +57,23 @@ class MThreeMain extends GameElement
 		super();
 		
 		this.dataManager = dataManager;
-		onTilePointerIn = new Signal1<MThreeTile>();
-		onTilePointerOut = new Signal1<MThreeTile>();
+		gridBoard = new Array<Array<MThreeGrid>>();
+		gridBlocks = new Array<Array<MThreeBlock>>();
+		gridSpawners = new Array<Array<MThreeSpawner>>();
+		tileList = new Array<MThreeTile>();
 		
 		gameScore = new AnimatedFloat(0.0);
 		gameTime = new AnimatedFloat(GameConstants.GAME_TIME_MAX);
+		
+		onTilePointerIn = new Signal1<MThreeTile>();
+		onTilePointerOut = new Signal1<MThreeTile>();
+		
+		tileDataTypes = new Array<MThreeTileData>();
 		
 		MThreeUtils.SetMThreeMain(this);
 	}
 	
 	public function CreateGrid(): Void {
-		gridBoard = new Array<Array<MThreeGrid>>();
-		
 		for (x in 0...GameConstants.GRID_ROWS) {
 			var gridArray: Array<MThreeGrid> = new Array<MThreeGrid>();
 			for (y in 0...GameConstants.GRID_COLS) {
@@ -89,9 +94,7 @@ class MThreeMain extends GameElement
 		}
 	}
 	
-	public function CreateBlocks(): Void {
-		gridBlocks = new Array<Array<MThreeBlock>>();
-		
+	public function CreateBlocks(): Void {		
 		for (ii in 0...gridBoard.length) {
 			var blockArray: Array<MThreeBlock> = new Array<MThreeBlock>();
 			for (grid in gridBoard[ii]) {
@@ -101,19 +104,19 @@ class MThreeMain extends GameElement
 		}
 	}
 	
-	public function CreateTiles(): Void {
-		tileList = new Array<MThreeTile>();
-		
+	public function CreateTiles(): Void {		
 		for (ii in 0...gridBoard.length) {
 			for (grid in gridBoard[ii]) {
 				CreateRandomTileCube(grid);
 			}
 		}
+		
+		// Making sure that when we initialize the board
+		// it doesn't contain any matches
+		InitBoard();
 	}
 	
 	public function CreateSpawners(): Void {
-		gridSpawners = new Array<Array<MThreeSpawner>>();
-		
 		for (x in 0...GameConstants.GRID_ROWS) {
 			var spawner: MThreeSpawner = new MThreeSpawner(dataManager.gameAsset.getTexture(AssetName.ASSET_CUBE));
 			spawner.SetParent(owner);
@@ -125,7 +128,6 @@ class MThreeMain extends GameElement
 	}
 	
 	public function PopulateTileData(): Void {
-		tileDataTypes = new Array<MThreeTileData>();
 		for (type in Type.allEnums(TileDataType)) {
 			var data: MThreeTileData = new MThreeTileData(
 				MThreeUtils.GetTileTexture(type, dataManager.gameAsset),
@@ -263,23 +265,30 @@ class MThreeMain extends GameElement
 		hasStarted = true;
 	}
 	
-	public function SetBoardDirty(): Void {		
-		if (!MThreeUtils.HasPossibleMoves()) {
-			BoardReset();
-		}
-
+	public function SetBoardDirty(): Void {	
+		CheckPossibleMoves();
+				
 		var matches: Array<Array<MThreeTileCube>> = MThreeUtils.GetAllMatches();
 		if (matches.length <= 0)
 			return;
 		
+		var totalScore: Float = 0.0;
 		for (tiles in matches) {
-			gameScore._ += MThreeUtils.GetScore(tiles);
+			totalScore += MThreeUtils.GetScore(tiles);			
 			
 			for (tile in tiles) {
-				//tile.AnimateAndDispose();
 				tile.dispose();
 			}
 		}
+		
+		gameScore._ += totalScore;
+		//var popup: MThreePopup = new MThreePopup("+" + totalScore, new Font(dataManager.gameAsset, FontName.FONT_UNCERTAIN_SANS_32), true);
+		//popup.SetParent(owner);
+		//popup.SetXY(
+			//System.stage.width * 0.42,
+			//System.stage.height * 0.075
+		//);
+		//AddToEntity(popup);
 		
 		RepeatCleaning();
 	}
@@ -319,13 +328,35 @@ class MThreeMain extends GameElement
 		stageClear.run(new Repeat(new Sequence([
 			new Delay(GameConstants.CHECK_DELAY),
 			new CallFunction(function() {
-				if (!MThreeUtils.HasMovingBlocks() && tileList.length == (GameConstants.GRID_ROWS * GameConstants.GRID_COLS)) {
+				if (!MThreeUtils.HasMovingBlocks() && tileList.length == (GameConstants.GRID_ROWS * GameConstants.GRID_COLS) - MThreeUtils.GetBlockedAndEmptyCount()) {
 					SetBoardDirty();
 					RemoveAndDispose(stageClear);
 				}
 			})
 		])));
 		AddToEntity(stageClear);
+	}
+	
+	public function CheckPossibleMoves(): Void {
+		if (MThreeUtils.HasMovingBlocks() || tileList.length != (GameConstants.GRID_ROWS * GameConstants.GRID_COLS) - MThreeUtils.GetBlockedAndEmptyCount())
+			return;
+		
+		if (MThreeUtils.HasPossbileMoves()) 
+			return;
+					
+		var script: Script = new Script();
+		script.run(new Sequence([
+			new Delay(0.25),
+			new CallFunction(function() {
+				SceneManager.ShowNoMovesScreen();
+			}),
+			new Delay(0.1),
+			new CallFunction(function() {
+				BoardReset();
+				RemoveAndDispose(script);
+			})
+		]));
+		AddToEntity(script);
 	}
 	
 	public function ShowPopup(tiles: Array<MThreeTileCube>, text: String): Void {
@@ -335,6 +366,48 @@ class MThreeMain extends GameElement
 			popup.SetGridID(tile.idx, tile.idy, true);
 			AddToEntity(popup);
 		}
+	}
+	
+	public function NoPossibleMovesDebug(): Void {
+		System.keyboard.down.connect(function(event: KeyboardEvent) {
+			if (event.key == Key.F1) {
+				gridBlocks[0][1].SetBlocked();
+				gridBlocks[1][1].SetBlocked();
+				gridBlocks[2][1].SetBlocked();
+				gridBlocks[5][1].SetBlocked();
+				gridBlocks[6][1].SetBlocked();
+				gridBlocks[7][1].SetBlocked();
+				
+				BoardReset();
+				RepeatCleaning();
+			}
+			
+			if (event.key == Key.F2) {
+				gridBlocks[0][1].SetBlocked();
+				gridBlocks[1][1].SetBlocked();
+				gridBlocks[2][1].SetBlocked();
+				gridBlocks[5][1].SetBlocked();
+				gridBlocks[6][1].SetBlocked();
+				gridBlocks[7][1].SetBlocked();
+				
+				gridBlocks[0][3].SetBlocked();
+				gridBlocks[1][3].SetBlocked();
+				gridBlocks[2][3].SetBlocked();
+				gridBlocks[5][3].SetBlocked();
+				gridBlocks[6][3].SetBlocked();
+				gridBlocks[7][3].SetBlocked();
+				
+				gridBlocks[0][5].SetBlocked();
+				gridBlocks[1][5].SetBlocked();
+				gridBlocks[2][5].SetBlocked();
+				gridBlocks[5][5].SetBlocked();
+				gridBlocks[6][5].SetBlocked();
+				gridBlocks[7][5].SetBlocked();
+		
+				BoardReset();
+				RepeatCleaning();
+			}
+		});
 	}
 	
 	override public function onStart() {
@@ -347,20 +420,13 @@ class MThreeMain extends GameElement
 		CreateSpawners();
 		GameControls();
 		
-		// Making sure that when we initialize the board
-		// it doesn't contain any matches
-		InitBoard();
+		RepeatCleaning();
 		
-		//var popup: MThreePopup = new MThreePopup("300", new Font(dataManager.gameAsset, FontName.FONT_UNCERTAIN_SANS_32));
-		//popup.SetParent(owner);
-		//popup.SetGridID(0, 0, true);
-		//AddToEntity(popup);
-		
-		System.keyboard.down.connect(function(event: KeyboardEvent) {
-			if (event.key == Key.Space) {
-				BoardReset();
-			}
-		});
+		// Debug for triggering no possbile moves
+		// Only availble on html build
+		#if html
+		NoPossibleMovesDebug();
+		#end
 	}
 	
 	override public function onUpdate(dt:Float) {
