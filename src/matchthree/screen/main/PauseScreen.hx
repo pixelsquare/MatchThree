@@ -54,7 +54,7 @@ class PauseScreen extends GameScreen
 		menuBackground.centerAnchor();
 		menuEntity.addChild(new Entity().add(menuBackground));
 		
-		var menuFont: Font = new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32);
+		var menuFont: Font = new Font(gameAsset, FontName.FONT_ARIAL_23);
 		var menuText: TextSprite = new TextSprite(menuFont, "Paused");
 		menuText.centerAnchor();
 		menuText.setXY(
@@ -64,7 +64,7 @@ class PauseScreen extends GameScreen
 		menuEntity.addChild(new Entity().add(menuText));
 		
 		var resumeBtn: GameButton = new GameButton(
-			new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32),
+			new Font(gameAsset, FontName.FONT_ARIAL_23),
 			"Resume",
 			[
 				gameAsset.getTexture(AssetName.ASSET_BUTTON_UP_SML),
@@ -82,7 +82,7 @@ class PauseScreen extends GameScreen
 		menuEntity.addChild(new Entity().add(resumeBtn));
 		
 		var restartBtn: GameButton = new GameButton(
-			new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32),
+			new Font(gameAsset, FontName.FONT_ARIAL_23),
 			"Restart",
 			[
 				gameAsset.getTexture(AssetName.ASSET_BUTTON_UP_SML),
@@ -100,7 +100,7 @@ class PauseScreen extends GameScreen
 		menuEntity.addChild(new Entity().add(restartBtn));
 		
 		var quitBtn: GameButton = new GameButton(
-			new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32),
+			new Font(gameAsset, FontName.FONT_ARIAL_23),
 			"Quit",
 			[
 				gameAsset.getTexture(AssetName.ASSET_BUTTON_UP_SML),

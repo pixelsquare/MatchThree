@@ -26,7 +26,9 @@ import matchthree.screen.GameScreen;
 class MainScreen extends GameScreen
 {
 	public var matchThreeMain(default, null): MThreeMain;
+	
 	private var gamePauseBtn: GameButton;
+	private var scoreText: TextSprite;
 	
 	public function new(assetPack: AssetPack, storage: StorageSystem) {		
 		super(assetPack, storage);
@@ -47,34 +49,37 @@ class MainScreen extends GameScreen
 		screenEntity.addChild(new Entity().add(boardImage));
 		
 		var scoreBoard: ImageSprite = new ImageSprite(gameAsset.getTexture(AssetName.ASSET_BOARD_SQUARE));
+		scoreBoard.centerAnchor();
 		scoreBoard.setXY(
 			boardImage.x._ - (boardImage.getNaturalWidth() / 2) + (scoreBoard.getNaturalWidth() * 0.5),
 			boardImage.y._ - (boardImage.getNaturalHeight() / 2) - (scoreBoard.getNaturalHeight() * 0.75)
 		);
-		scoreBoard.centerAnchor();
 		screenEntity.addChild(new Entity().add(scoreBoard));
 		
-		var scoreFont: Font = new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32);
-		var scoreText: TextSprite = new TextSprite(scoreFont, "Score: 0");
+		var scoreFont: Font = new Font(gameAsset, FontName.FONT_ARIAL_18);
+		scoreText = new TextSprite(scoreFont, "Score: 0");
+		scoreText.centerAnchor();
 		scoreText.setXY(
-			scoreBoard.x._ - (scoreBoard.getNaturalWidth() * 0.6) + (scoreText.getNaturalWidth() / 2),	
-			scoreBoard.y._ - (scoreBoard.getNaturalHeight() * 0.6) + (scoreText.getNaturalHeight() / 2)
+			scoreBoard.x._,	
+			scoreBoard.y._
 		);
-		//scoreText.centerAnchor();
 		screenEntity.addChild(new Entity().add(scoreText));
 		
 		var timeBoard: ImageSprite = new ImageSprite(gameAsset.getTexture(AssetName.ASSET_BOARD_SQUARE));
+		timeBoard.centerAnchor();
 		timeBoard.setXY(
-			boardImage.x._ - (boardImage.getNaturalWidth() / 2) + (scoreBoard.getNaturalWidth() * 0.5) + (timeBoard.getNaturalWidth() * 1.25),
+			boardImage.x._ + (boardImage.getNaturalWidth() / 2) - (scoreBoard.getNaturalWidth()),
 			boardImage.y._ - (boardImage.getNaturalHeight() / 2) - (scoreBoard.getNaturalHeight() * 0.75)
 		);
-		timeBoard.centerAnchor();
 		screenEntity.addChild(new Entity().add(timeBoard));
 		
-		var timeFont: Font = new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32);
-		var timeText: TextSprite = new TextSprite(timeFont, "Time:   " + Utils.ToMMSS(0.0));
-		timeText.setXY(timeBoard.x._, timeBoard.y._);
+		var timeFont: Font = new Font(gameAsset, FontName.FONT_ARIAL_18);
+		var timeText: TextSprite = new TextSprite(timeFont, "Time Left:    " + Utils.ToMMSS(0.0));
 		timeText.centerAnchor();
+		timeText.setXY(
+			timeBoard.x._, 
+			timeBoard.y._
+		);
 		screenEntity.addChild(new Entity().add(timeText));
 		
 		gamePauseBtn = new GameButton(
@@ -104,11 +109,13 @@ class MainScreen extends GameScreen
 		screenEntity.addChild(new Entity().add(matchThreeMain));
 		
 		matchThreeMain.gameTime.watch(function(newTime: Float, oldTime: Float) {
-			timeText.text = "Time:   " + Utils.ToMMSS(newTime);
+			timeText.text = "Time Left:    " + Utils.ToMMSS(newTime);
+			timeText.centerAnchor();
 		});
 		
 		matchThreeMain.gameScore.watch(function(newScore: Float, oldScore: Float) {
 			scoreText.text = "Score: " + Std.int(newScore);
+			scoreText.centerAnchor();
 		});
 		
 		#if html

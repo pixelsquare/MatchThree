@@ -57,16 +57,16 @@ class GameOverScreen extends GameScreen
 		menuBackground.centerAnchor();
 		menuEntity.addChild(new Entity().add(menuBackground));
 		
-		var menuFont: Font = new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32);
+		var menuFont: Font = new Font(gameAsset, FontName.FONT_ARIAL_23);
 		var menuText: TextSprite = new TextSprite(menuFont, "Game Over");
 		menuText.centerAnchor();
 		menuText.setXY(
 			menuBackground.x._,
-			menuBackground.y._ - (menuBackground.getNaturalHeight() * 0.385)
+			menuBackground.y._ - (menuBackground.getNaturalHeight() * 0.4)
 		);
 		menuEntity.addChild(new Entity().add(menuText));
 		
-		var totalScoreFont: Font = new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32);
+		var totalScoreFont: Font = new Font(gameAsset, FontName.FONT_ARIAL_YELLOW_23);
 		var totalScoreText: TextSprite = new TextSprite(totalScoreFont, "Total Score");
 		totalScoreText.centerAnchor();
 		totalScoreText.setXY(
@@ -75,8 +75,8 @@ class GameOverScreen extends GameScreen
 		);
 		menuEntity.addChild(new Entity().add(totalScoreText));
 		
-		var scoreFont: Font = new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32);
-		var scoreText: TextSprite = new TextSprite(scoreFont, "99999");
+		var scoreFont: Font = new Font(gameAsset, FontName.FONT_ARIAL_32);
+		var scoreText: TextSprite = new TextSprite(scoreFont, "999999");
 		scoreText.centerAnchor();
 		scoreText.setXY(
 			menuBackground.x._,
@@ -86,10 +86,11 @@ class GameOverScreen extends GameScreen
 		
 		SceneManager.instance.gameMainScreen.matchThreeMain.gameScore.watch(function(newScore:Float, oldScore:Float) {
 			scoreText.text = Std.int(newScore) + "";
+			scoreText.centerAnchor();
 		});
 		
 		var restartBtn: GameButton = new GameButton(
-			new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32),
+			new Font(gameAsset, FontName.FONT_ARIAL_23),
 			"Restart",
 			[
 				gameAsset.getTexture(AssetName.ASSET_BUTTON_UP_SML),
@@ -107,7 +108,7 @@ class GameOverScreen extends GameScreen
 		menuEntity.addChild(new Entity().add(restartBtn));
 		
 		var quitBtn: GameButton = new GameButton(
-			new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32),
+			new Font(gameAsset, FontName.FONT_ARIAL_23),
 			"Quit",
 			[
 				gameAsset.getTexture(AssetName.ASSET_BUTTON_UP_SML),

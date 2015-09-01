@@ -49,7 +49,7 @@ class TitleScreen extends GameScreen
 		
 		// Start Button --
 		startGameBtn = new GameButton(
-			new Font(gameAsset, FontName.FONT_UNCERTAIN_SANS_32), 
+			new Font(gameAsset, FontName.FONT_ARIAL_32), 
 			"Start Game",
 			[
 				gameAsset.getTexture(AssetName.ASSET_BUTTON_UP_LRG),
