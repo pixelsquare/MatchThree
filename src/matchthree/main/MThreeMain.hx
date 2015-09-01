@@ -52,6 +52,7 @@ class MThreeMain extends GameElement
 	private var tileDataTypes: Array<MThreeTileData>;
 	
 	private var hasStarted: Bool;
+	private var isCleaning: Bool;
 	
 	public function new(dataManager: DataManager) {
 		super();
@@ -184,20 +185,29 @@ class MThreeMain extends GameElement
 			tileOut = tile;
 		});
 	
-		System.pointer.down.connect(function(event: PointerEvent) {		
+		System.pointer.down.connect(function(event: PointerEvent) {	
+			if(isCleaning || MThreeUtils.HasMovingBlocks() || 
+				tileList.length != (GameConstants.GRID_ROWS * GameConstants.GRID_COLS) - MThreeUtils.GetBlockedAndEmptyCount())
+				return;
+				
 			if (curTile == tileOut)
 				return;
-			
+				
 			startPoint = new Point(
 				event.viewX - (System.stage.width / 2), 
 				(System.stage.height / 2) - event.viewY
 			);
+			
 			endPoint = new Point();
 			pointerDown = true;
 			tileClicked = curTile;
 		});
 		
 		System.pointer.up.connect(function(event: PointerEvent) {
+			if(isCleaning || MThreeUtils.HasMovingBlocks() || 
+				tileList.length != (GameConstants.GRID_ROWS * GameConstants.GRID_COLS) - MThreeUtils.GetBlockedAndEmptyCount())
+				return;
+				
 			if (!pointerDown)
 				return;
 			
@@ -324,12 +334,14 @@ class MThreeMain extends GameElement
 	}
 	
 	public function RepeatCleaning(): Void {
+		isCleaning = true;
 		var stageClear: Script = new Script();
 		stageClear.run(new Repeat(new Sequence([
 			new Delay(GameConstants.CHECK_DELAY),
 			new CallFunction(function() {
 				if (!MThreeUtils.HasMovingBlocks() && tileList.length == (GameConstants.GRID_ROWS * GameConstants.GRID_COLS) - MThreeUtils.GetBlockedAndEmptyCount()) {
 					SetBoardDirty();
+					isCleaning = false;
 					RemoveAndDispose(stageClear);
 				}
 			})
